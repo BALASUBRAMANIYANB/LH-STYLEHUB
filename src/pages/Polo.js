@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaBell, FaGift, FaFire, FaStar } from 'react-icons/fa';
+import { FaBell, FaGift, FaStar } from 'react-icons/fa';
 import './Polo.css';
 
 const Polo = () => {
@@ -24,10 +24,6 @@ const Polo = () => {
         <section className="polo-hero">
           <div className="hero-content">
             <div className="hero-text">
-              <div className="festival-badge">
-                <FaFire className="fire-icon" />
-                <span>GRAND FESTIVAL LAUNCH</span>
-              </div>
               
               <h1 className="hero-title">
                 PREMIUM POLO COLLECTION
@@ -80,7 +76,6 @@ const Polo = () => {
                   </div>
                   <div className="preview-info">
                     <h3>PREMIUM POLO</h3>
-                    <p>Festival Collection</p>
                   </div>
                 </div>
               </div>
@@ -99,13 +94,7 @@ const Polo = () => {
               <p>Made with the finest materials and craftsmanship for ultimate comfort and style.</p>
             </div>
             
-            <div className="feature-card">
-              <div className="feature-icon">
-                <FaFire />
-              </div>
-              <h3>Festival Vibes</h3>
-              <p>Designed for the grand festival launch with unique patterns and vibrant colors.</p>
-            </div>
+            
             
             <div className="feature-card">
               <div className="feature-icon">
