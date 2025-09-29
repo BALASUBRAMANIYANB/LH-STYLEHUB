@@ -286,8 +286,8 @@ const ProductDetails = ({ addToCart }) => {
 
               {/* Price */}
               <div className="product-price">
-                <span className="current-price">₹{product.price}</span>
-                <span className="original-price">₹{product.originalPrice}</span>
+                <span className="current-price">Rs. {product.price.toFixed(2)}</span>
+                <span className="original-price">Rs. {product.originalPrice.toFixed(2)}</span>
                 <span className="discount">
                   {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
                 </span>

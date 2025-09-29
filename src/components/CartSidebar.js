@@ -12,7 +12,7 @@ const CartSidebar = ({
   onCheckout 
 }) => {
   const formatPrice = (price) => {
-    return `₹${price}`;
+    return `Rs. ${Number(price).toFixed(2)}`;
   };
 
   const getItemTotal = (item) => {

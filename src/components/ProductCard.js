@@ -23,7 +23,7 @@ const ProductCard = ({ product, addToCart }) => {
   };
 
   const formatPrice = (price) => {
-    return `$${price.toFixed(2)}`;
+    return `Rs. ${price.toFixed(2)}`;
   };
 
   return (
