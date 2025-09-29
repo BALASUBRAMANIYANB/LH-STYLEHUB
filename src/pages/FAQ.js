@@ -114,7 +114,7 @@ const FAQ = () => {
               
               <div className="help-option">
                 <h3>WhatsApp Support</h3>
-                <p>+919080041049</p>
+                <p>9791999113</p>
                 <p>Quick responses during business hours</p>
               </div>
               
@@ -154,7 +154,7 @@ const FAQ = () => {
       </div>
 
       {/* Floating WhatsApp Support Button */}
-      <a href="https://wa.me/919080041049" className="whatsapp-support" target="_blank" rel="noopener noreferrer">
+      <a href="https://wa.me/9791999113" className="whatsapp-support" target="_blank" rel="noopener noreferrer">
         <FaWhatsapp />
       </a>
     </div>

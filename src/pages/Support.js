@@ -108,7 +108,7 @@ const Support = () => {
                 <h3>WhatsApp Support</h3>
                 <p>Quick responses, instant help</p>
                 <a 
-                  href="https://wa.me/919080041049" 
+                  href="https://wa.me/9791999113" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="contact-button"
@@ -140,7 +140,7 @@ const Support = () => {
                 <h3>Phone Support</h3>
                 <p>Direct conversation</p>
                 <a 
-                  href="tel:+919080041049" 
+                  href="tel:9791999113" 
                   className="contact-button"
                 >
                   Call Now
@@ -173,7 +173,7 @@ const Support = () => {
                 <FaPhone className="info-icon" />
                 <div className="info-content">
                   <h4>Phone</h4>
-                  <p>+919080041049</p>
+                  <p>9791999113</p>
                 </div>
               </div>
               

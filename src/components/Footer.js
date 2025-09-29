@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaInstagram, FaTwitter, FaFacebook, FaWhatsapp, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaInstagram, FaWhatsapp, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import './Footer.css';
 
 const Footer = () => {
@@ -22,13 +22,7 @@ const Footer = () => {
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <FaInstagram />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                <FaTwitter />
-              </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                <FaFacebook />
-              </a>
-              <a href="https://wa.me/919080041049" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+              <a href="https://wa.me/9791999113" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
                 <FaWhatsapp />
               </a>
             </div>
@@ -61,7 +55,7 @@ const Footer = () => {
             <div className="contact-info">
               <div className="contact-item">
                 <FaPhone />
-                <span>+919080041049</span>
+                <span>9791999113</span>
               </div>
               <div className="contact-item">
                 <FaEnvelope />
