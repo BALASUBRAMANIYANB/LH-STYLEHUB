@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { FaArrowLeft, FaShoppingCart, FaShare, FaHeart, FaStar, FaTimes, FaChevronLeft, FaChevronRight, FaChevronDown } from 'react-icons/fa';
+import { FaArrowLeft, FaShoppingCart, FaShare, FaHeart, FaTimes, FaChevronLeft, FaChevronRight, FaChevronDown } from 'react-icons/fa';
 import './ProductDetails.css';
 
 const ProductDetails = ({ addToCart }) => {
@@ -204,7 +204,7 @@ const ProductDetails = ({ addToCart }) => {
     setActiveAccordion(activeAccordion === section ? null : section);
   };
 
-  const averageRating = product.reviews.reduce((acc, review) => acc + review.rating, 0) / product.reviews.length;
+  
 
   return (
     <div className="kiivo-product-details">
@@ -275,20 +275,7 @@ const ProductDetails = ({ addToCart }) => {
               <h1 className="product-name">{product.name}</h1>
               <p className="product-subtitle">{product.subtitle}</p>
               
-              {/* Rating */}
-              <div className="product-rating">
-                <div className="stars">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <FaStar
-                      key={star}
-                      className={star <= averageRating ? 'star filled' : 'star'}
-                    />
-                  ))}
-                </div>
-                <span className="rating-text">
-                  {averageRating.toFixed(1)} ({product.reviews.length} reviews)
-                </span>
-              </div>
+              
 
               {/* Live Viewers */}
               <div className="live-viewers">
@@ -533,30 +520,7 @@ const ProductDetails = ({ addToCart }) => {
               </div>
             </div>
 
-            <div className="tab-section">
-              <h3>Customer Reviews</h3>
-              <div className="reviews-container">
-                {product.reviews.map((review) => (
-                  <div key={review.id} className="review-item">
-                    <div className="review-header">
-                      <div className="reviewer-info">
-                        <h4>{review.name}</h4>
-                        <div className="review-stars">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <FaStar
-                              key={star}
-                              className={star <= review.rating ? 'star filled' : 'star'}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      <span className="review-date">{review.date}</span>
-                    </div>
-                    <p className="review-comment">{review.comment}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            
           </div>
         </div>
 
