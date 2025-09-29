@@ -642,37 +642,7 @@ const ProductDetails = ({ addToCart }) => {
             )}
           </div>
 
-          <div className="accordion-item">
-            <div 
-              className="accordion-header"
-              onClick={() => toggleAccordion('returns')}
-            >
-              <span className="accordion-title">RETURN & EXCHANGE</span>
-              <FaChevronDown className={`accordion-icon ${activeAccordion === 'returns' ? 'active' : ''}`} />
-            </div>
-            {activeAccordion === 'returns' && (
-              <div className="accordion-content">
-                <div className="return-policy">
-                  <h4>Return Policy</h4>
-                  <p>{product.returnPolicy}</p>
-                  <ul>
-                    <li>30-day return window from delivery date</li>
-                    <li>Items must be unworn, unwashed, and with original tags</li>
-                    <li>Free return shipping for defective items</li>
-                    <li>Exchange available for different sizes</li>
-                    <li>Refund processed within 5-7 business days</li>
-                  </ul>
-                  <h4>Exchange Policy</h4>
-                  <ul>
-                    <li>Size exchanges available within 15 days</li>
-                    <li>Color exchanges subject to availability</li>
-                    <li>No additional charges for size exchanges</li>
-                    <li>Exchange items shipped within 2-3 business days</li>
-                  </ul>
-                </div>
-              </div>
-            )}
-          </div>
+          
         </div>
       </div>
     </div>

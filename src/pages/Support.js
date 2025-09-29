@@ -233,7 +233,6 @@ const Support = () => {
             <p>Find answers to common questions</p>
             <div className="help-links">
               <a href="/faq" className="help-link">FAQ</a>
-              <a href="/return-policy" className="help-link">Return Policy</a>
               <a href="/products" className="help-link">Size Guide</a>
               <a href="/tracking" className="help-link">Track Order</a>
             </div>

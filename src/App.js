@@ -9,7 +9,6 @@ import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
 import Polo from './pages/Polo';
 import FAQ from './pages/FAQ';
-import ReturnPolicy from './pages/ReturnPolicy';
 import Support from './pages/Support';
 import Profile from './pages/Profile';
 import Checkout from './pages/Checkout';
@@ -106,7 +105,6 @@ function App() {
             <Route path="/product/:id" element={<ProductDetails addToCart={addToCart} />} />
             <Route path="/polo" element={<Polo />} />
                 <Route path="/faq" element={<FAQ />} />
-                <Route path="/return-policy" element={<ReturnPolicy />} />
                 <Route path="/support" element={<Support />} />
                 <Route path="/terms" element={<TermsConditions />} />
             <Route path="/story" element={<div className="page-placeholder">Our Story Page</div>} />

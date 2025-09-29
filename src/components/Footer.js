@@ -50,7 +50,6 @@ const Footer = () => {
             <h3>Support</h3>
             <ul className="footer-links">
               <li><Link to="/support">Contact Us</Link></li>
-              <li><Link to="/return-policy">Return Policy</Link></li>
               <li><Link to="/tracking">Track Order</Link></li>
               <li><Link to="/orders">My Orders</Link></li>
             </ul>
