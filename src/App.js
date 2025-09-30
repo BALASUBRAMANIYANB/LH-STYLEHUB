@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import SellerDashboard from './pages/SellerDashboard';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Story from './pages/Story';
 import { AuthProvider } from './contexts/AuthContext';
@@ -116,6 +117,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/checkout" element={<Checkout cartItems={cartItems} onOrderComplete={() => {}} onClearCart={() => setCartItems([])} />} />
             <Route path="/orders" element={<div className="page-placeholder">My Orders Page</div>} />
+            <Route path="/seller" element={<SellerDashboard />} />
           </Routes>
         </main>
 
