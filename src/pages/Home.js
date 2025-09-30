@@ -16,24 +16,10 @@ const Home = () => {
     },
     {
       id: 2,
-      image: '/images/posters/P-2.PNG',
+      image: '/images/posters/P-2.jpg',
       title: 'OVERSIZED I CAN FLY TEE',
       subtitle: 'TRAVIS SCOTT COLLECTION',
       description: 'Elevate your style with premium oversized fits'
-    },
-    {
-      id: 3,
-      image: '/images/posters/P-3.JPG',
-      title: 'OVERSIZED XO HORIZON TEE',
-      subtitle: 'THE WEEKND',
-      description: 'Unique designs for unique personalities'
-    },
-    {
-      id: 4,
-      image: '/images/posters/P-4.jpg',
-      title: 'PREMIUM POSTER P-4',
-      subtitle: 'NEW DROP',
-      description: 'Discover the latest in our poster collection!'
     }
   ];
 
