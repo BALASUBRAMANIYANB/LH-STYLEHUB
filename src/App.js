@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Story from './pages/Story';
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -107,7 +109,8 @@ function App() {
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/support" element={<Support />} />
                 <Route path="/terms" element={<TermsConditions />} />
-            <Route path="/story" element={<div className="page-placeholder">Our Story Page</div>} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/story" element={<Story />} />
             <Route path="/cart" element={<div className="page-placeholder">Cart Page</div>} />
             <Route path="/tracking" element={<div className="page-placeholder">Order Tracking Page</div>} />
             <Route path="/profile" element={<Profile />} />

@@ -21,12 +21,8 @@ const ProductDetails = ({ addToCart }) => {
       price: 749,
       originalPrice: 999,
       images: [
-    '/images/products/K-1.jpg',
-    '/images/products/K-2.jpg',
-    '/images/products/K-3.jpg',
-    '/images/products/K-4.jpg',
-    '/images/products/K-5.jpg',
-    '/images/products/K-6.jpg'
+        '/images/posters/P-1.jpg',
+        '/images/posters/P-2.PNG'
       ],
       sizes: ['S', 'M', 'L', 'XL', 'XXL'],
       colors: [
@@ -71,12 +67,8 @@ const ProductDetails = ({ addToCart }) => {
       price: 749,
       originalPrice: 999,
       images: [
-    '/images/products/T-1.jpg',
-    '/images/products/T-2.jpg',
-    '/images/products/T-3.jpg',
-    '/images/products/T-4.jpg',
-    '/images/products/T-5.jpg',
-    '/images/products/T-6.jpg'
+        '/images/posters/P-1.jpg',
+        '/images/posters/P-2.PNG'
       ],
       sizes: ['S', 'M', 'L', 'XL', 'XXL'],
       fabric: '220 GSM, 100% Combed Cotton (Single Jersey)',
@@ -116,12 +108,8 @@ const ProductDetails = ({ addToCart }) => {
       price: 749,
       originalPrice: 999,
       images: [
-    '/images/products/W-1.jpg',
-    '/images/products/W-2.jpg',
-    '/images/products/W-3.jpg',
-    '/images/products/W-4.jpg',
-    '/images/products/W-5.jpg',
-    '/images/products/W-6.jpg'
+        '/images/posters/P-1.jpg',
+        '/images/posters/P-2.PNG'
       ],
       sizes: ['S','M', 'L', 'XL', 'XXL'],
       fabric: '220 GSM, 100% Combed Cotton (Single Jersey)',
@@ -378,28 +366,10 @@ const ProductDetails = ({ addToCart }) => {
             </div>
 
             {/* Color Selection */}
-            {product.colors && (
-              <div className="color-selection">
-                <h3>Select Color</h3>
-                <div className="color-options">
-                  {product.colors.map((color) => (
-                    <button
-                      key={color.value}
-                      className={`color-option ${selectedColor === color.value ? 'selected' : ''} ${!color.available ? 'unavailable' : ''}`}
-                      onClick={() => color.available && setSelectedColor(color.value)}
-                      disabled={!color.available}
-                      style={{ backgroundColor: color.value }}
-                      title={color.name}
-                    >
-                      {color.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Color selection removed as requested */}
 
             {/* Quantity Selection */}
-            <div className="quantity-selection">
+            <div className="quantity-selection" style={{ marginBottom: '10px' }}>
               <h3>Quantity</h3>
               <div className="quantity-controls">
                 <button
