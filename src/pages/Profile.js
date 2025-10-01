@@ -334,6 +334,20 @@ const Profile = () => {
                           ))}
                         </div>
                       )}
+
+                      {order.shipment && (
+                        <div className="order-shipment" style={{ marginTop: '8px' }}>
+                          <p><strong>AWB:</strong> {order.shipment.awb || 'Pending'}</p>
+                          {order.shipment.trackingUrl && (
+                            <p>
+                              <a href={order.shipment.trackingUrl} target="_blank" rel="noopener noreferrer">Track Shipment</a>
+                            </p>
+                          )}
+                          {order.shipment.current_status && (
+                            <small>Status: {order.shipment.current_status}</small>
+                          )}
+                        </div>
+                      )}
                       
                       <div className="order-footer">
                         <div className="order-total">
