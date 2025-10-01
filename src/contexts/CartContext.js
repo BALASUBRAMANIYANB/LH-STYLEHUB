@@ -53,19 +53,28 @@ export function CartProvider({ children }) {
 
   // Cart actions
   const addToCart = (product, selectedSize) => {
+    console.log('[CartProvider] addToCart called. currentUser:', currentUser);
     setCart(prev => {
+      let newCart;
       const existing = prev.find(
         item => item.id === product.id && item.selectedSize === selectedSize
       );
       if (existing) {
-        return prev.map(item =>
+        newCart = prev.map(item =>
           item.id === product.id && item.selectedSize === selectedSize
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       } else {
-        return [...prev, { ...product, selectedSize, quantity: 1 }];
+        newCart = [...prev, { ...product, selectedSize, quantity: 1 }];
       }
+      // Write to Firebase immediately
+      if (currentUser) {
+        set(ref(database, `users/${currentUser.uid}/cart`), newCart)
+          .then(() => console.log('[CartProvider] Cart write success (immediate)', newCart))
+          .catch((err) => console.error('[CartProvider] Cart write error (immediate)', err));
+      }
+      return newCart;
     });
   };
 
