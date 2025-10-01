@@ -12,7 +12,11 @@ const CartSidebar = ({
   onCheckout 
 }) => {
   const formatPrice = (price) => {
-    return `Rs. ${Number(price).toFixed(2)}`;
+    try {
+      return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(price);
+    } catch {
+      return `₹${Number(price).toFixed(2)}`;
+    }
   };
 
   const getItemTotal = (item) => {

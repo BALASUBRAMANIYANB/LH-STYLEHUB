@@ -31,6 +31,7 @@ const fetchAllOrders = async () => {
 const SellerDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [shipmentEdits, setShipmentEdits] = useState({});
 
   const handleEditChange = (orderKey, field, value) => {
@@ -95,10 +96,18 @@ const SellerDashboard = () => {
   };
 
   useEffect(() => {
-    fetchAllOrders().then((data) => {
-      setOrders(data);
-      setLoading(false);
-    });
+    (async () => {
+      try {
+        const data = await fetchAllOrders();
+        setOrders(data);
+      } catch (err) {
+        console.error('Failed to load orders:', err);
+        const msg = err?.message || String(err) || 'Failed to load orders';
+        setError(msg.includes('PERMISSION_DENIED') ? 'Permission denied reading orders. Update Realtime Database rules to allow admin read access to users/*.' : msg);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -118,6 +127,10 @@ const SellerDashboard = () => {
       <h1>Seller Dashboard</h1>
       {loading ? (
         <p>Loading orders...</p>
+      ) : error ? (
+        <div style={{ background: '#fff3f3', border: '1px solid #f5c2c7', padding: '12px 16px', borderRadius: 8, color: '#842029' }}>
+          {error}
+        </div>
       ) : orders.length === 0 ? (
         <p>No orders found.</p>
       ) : (
