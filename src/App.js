@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SellerDashboard from './pages/SellerDashboard';
+import Cart from './pages/Cart';
 import RequireAdmin from './components/RequireAdmin';
 import { useAuth } from './contexts/AuthContext';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -74,7 +75,7 @@ function AppContent() {
             <Route path="/terms" element={<TermsConditions />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/story" element={<Story />} />
-            <Route path="/cart" element={<div className="page-placeholder">Cart Page</div>} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/tracking" element={<div className="page-placeholder">Order Tracking Page</div>} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/checkout" element={<Checkout cartItems={cart} onOrderComplete={() => {}} onClearCart={clearCart} />} />
