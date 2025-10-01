@@ -96,8 +96,8 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #e0e0e0;
+  background: rgba(0, 0, 0, 0.55);
+  border: none;
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -106,15 +106,16 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 2;
-  color: #333333;
+  z-index: 5;
+  color: #ffffff;
   font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .carousel-nav:hover {
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transform: translateY(-50%) scale(1.1);
+  background: rgba(0, 0, 0, 0.75);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  transform: translateY(-50%) scale(1.08);
 }
 
 .carousel-nav:disabled {
@@ -247,7 +248,7 @@
 .product-subtitle {
   font-size: 16px;
   color: #666666;
-  margin: 0 0 24px 0;
+  margin: 0 !important;
   font-weight: 400;
 }
 
@@ -521,7 +522,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 0 !important;
 }
 
 .size-guide-header h3 {
@@ -697,6 +698,9 @@
   
   .image-carousel {
     height: 68vh;
+    margin-left: -16px;
+    margin-right: -16px;
+    width: calc(100% + 32px);
   }
   
   .carousel-nav {
@@ -799,6 +803,9 @@
   
   .image-carousel {
     height: 70vh;
+    margin-left: -12px;
+    margin-right: -12px;
+    width: calc(100% + 24px);
   }
   
   .carousel-nav {

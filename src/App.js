@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SellerDashboard from './pages/SellerDashboard';
+import RequireAdmin from './components/RequireAdmin';
+import { useAuth } from './contexts/AuthContext';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Story from './pages/Story';
 import { AuthProvider } from './contexts/AuthContext';
@@ -9,6 +11,7 @@ import Footer from './components/Footer';
 import LoginModal from './components/LoginModal';
 import Home from './pages/Home';
 import Products from './pages/Products';
+import TShirts from './pages/TShirts';
 import ProductDetails from './pages/ProductDetails';
 import Polo from './pages/Polo';
 import FAQ from './pages/FAQ';
@@ -105,11 +108,12 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/tshirts" element={<TShirts />} />
             <Route path="/product/:id" element={<ProductDetails addToCart={addToCart} />} />
             <Route path="/polo" element={<Polo />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/support" element={<Support />} />
-                <Route path="/terms" element={<TermsConditions />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/support" element={<Support />} />
+            <Route path="/terms" element={<TermsConditions />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/story" element={<Story />} />
             <Route path="/cart" element={<div className="page-placeholder">Cart Page</div>} />
@@ -117,7 +121,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/checkout" element={<Checkout cartItems={cartItems} onOrderComplete={() => {}} onClearCart={() => setCartItems([])} />} />
             <Route path="/orders" element={<div className="page-placeholder">My Orders Page</div>} />
-            <Route path="/seller" element={<SellerDashboard />} />
+            <Route path="/seller" element={<RequireAdmin><SellerDashboard /></RequireAdmin>} />
           </Routes>
         </main>
 

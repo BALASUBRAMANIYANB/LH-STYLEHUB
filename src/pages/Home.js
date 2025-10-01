@@ -109,10 +109,11 @@ const Home = () => {
                 playsInline
                 className="video-element"
               >
-                <source src="/videos/video1.mp4" type="video/mp4" />
+                <source src="/videos/video1.MOV" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
+            <div className="video-separator"></div>
             <div className="video-grid-item">
               <video 
                 autoPlay 
@@ -121,7 +122,20 @@ const Home = () => {
                 playsInline
                 className="video-element"
               >
-                <source src="/videos/Video2.mp4" type="video/mp4" />
+                <source src="/videos/video 2.MP4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div className="video-separator"></div>
+            <div className="video-grid-item">
+              <video 
+                autoPlay 
+                muted 
+                loop 
+                playsInline
+                className="video-element"
+              >
+                <source src="/videos/video3.MP4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>

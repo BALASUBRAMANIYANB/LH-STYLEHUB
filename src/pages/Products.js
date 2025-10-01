@@ -11,7 +11,7 @@ const Products = () => {
       subtitle: 'THE CULTURE GLITCH',
       price: 749,
       originalPrice: 999,
-    image: '/images/products/K-1.jpg',
+      image: '/images/products/K-1.jpg',
       category: 'THE CULTURE GLITCH'
     },
     {
@@ -20,7 +20,7 @@ const Products = () => {
       subtitle: 'TRAVIS SCOTT',
       price: 749,
       originalPrice: 999,
-    image: '/images/products/T-1.jpg',
+      image: '/images/products/T-1.jpg',
       category: 'TRAVIS SCOTT COLLECTION'
     },
     {
@@ -29,7 +29,7 @@ const Products = () => {
       subtitle: 'THE WEEKND',
       price: 749,
       originalPrice: 999,
-    image: '/images/products/W-1.jpg',
+      image: '/images/products/W-1.jpg',
       category: 'THE WEEKND'
     },
   ];
@@ -54,23 +54,18 @@ const Products = () => {
                   </Link>
                 </div>
               </div>
-              
               <div className="product-info">
                 <h3 className="product-name">{product.name}</h3>
                 <p className="product-subtitle">{product.subtitle}</p>
-                
                 <div className="product-price">
-                  <span className="current-price">Rs. {product.price.toFixed(2)}</span>
-                  <span className="original-price">Rs. {product.originalPrice.toFixed(2)}</span>
-                  <span className="discount">
-                    {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
-                  </span>
+                  <span className="current-price">Rs. {product.price}</span>
+                  <span className="original-price">Rs. {product.originalPrice}</span>
+                  <span className="discount">{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF</span>
                 </div>
-
                 <div className="product-actions">
-                  <Link to={`/product/${product.id}`} className="add-to-cart">
+                  <button className="add-to-cart">
                     Add to Cart
-                  </Link>
+                  </button>
                   <button className="buy-now">
                     Buy Now
                   </button>
