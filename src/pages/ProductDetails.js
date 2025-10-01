@@ -177,12 +177,17 @@ const ProductDetails = ({ addToCart }) => {
       alert('Please select a size');
       return;
     }
-    addToCart({
-      ...product,
-      image: product.images[0],
-      selectedSize,
-      quantity
-    }, selectedSize);
+    // Add the correct quantity
+    for (let i = 0; i < quantity; i++) {
+      addToCart({
+        ...product,
+        image: product.images[0],
+        selectedSize
+      }, selectedSize);
+    }
+    setTimeout(() => {
+      console.log('Cart after add:', window.localStorage.getItem('cart'));
+    }, 500);
     alert(`${product.name} (Size: ${selectedSize}) added to cart!`);
     window.location.href = '/cart';
   };
