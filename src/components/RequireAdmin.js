@@ -2,14 +2,18 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-// Change this to your admin UID
-const ADMIN_UID = 'YOUR_ADMIN_UID_HERE';
+// Change this to your admin email
+const ADMIN_EMAIL = 'Lhstylehub@gmail.com';
 
 export default function RequireAdmin({ children }) {
-  const { currentUser, userProfile } = useAuth();
+  const { currentUser } = useAuth();
 
-  // UID-based admin check
-  const isAdmin = currentUser && (currentUser.uid === ADMIN_UID);
+  // Strict email-based admin check
+  const isAdmin = !!(
+    currentUser &&
+    currentUser.email &&
+    currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+  );
 
   if (!isAdmin) {
     return (

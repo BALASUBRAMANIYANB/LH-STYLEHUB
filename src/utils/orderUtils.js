@@ -64,10 +64,15 @@ export const getOrderStatusText = (status) => {
 };
 
 export const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(amount);
+  try {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 2
+    }).format(amount);
+  } catch {
+    return `₹${Number(amount).toFixed(2)}`;
+  }
 };
 
 export const formatDate = (dateString) => {

@@ -6,6 +6,14 @@ import { createOrder } from '../utils/orderUtils';
 import { FaShoppingCart, FaUser, FaMapMarkerAlt, FaCreditCard, FaLock } from 'react-icons/fa';
 import './Checkout.css';
 
+const formatINR = (amount) => {
+  try {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(amount);
+  } catch {
+    return `₹${Number(amount).toFixed(2)}`;
+  }
+};
+
 // Razorpay script loader
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -70,7 +78,7 @@ const Checkout = ({ onOrderComplete }) => {
     city: '',
     state: '',
     zipCode: '',
-    country: 'United States'
+    country: 'India'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -88,11 +96,13 @@ const Checkout = ({ onOrderComplete }) => {
   };
 
   const getShippingCost = () => {
-    return getCartTotal() > 50 ? 0 : 5.99; // Free shipping over $50
+    // Free shipping over ₹999, else flat ₹80
+    return getCartTotal() > 999 ? 0 : 80;
   };
 
   const getTax = () => {
-    return getCartTotal() * 0.08; // 8% tax
+    // Prices are tax-inclusive for INR
+    return 0;
   };
 
   const getFinalTotal = () => {
@@ -209,7 +219,7 @@ const Checkout = ({ onOrderComplete }) => {
                     <p>Quantity: {item.quantity}</p>
                   </div>
                   <div className="item-price">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatINR(item.price * item.quantity)}
                   </div>
                 </div>
               ))}
@@ -374,19 +384,19 @@ const Checkout = ({ onOrderComplete }) => {
                 <div className="total-breakdown">
                   <div className="total-row">
                     <span>Subtotal:</span>
-                    <span>${getCartTotal().toFixed(2)}</span>
+                    <span>{formatINR(getCartTotal())}</span>
                   </div>
                   <div className="total-row">
                     <span>Shipping:</span>
-                    <span>{getShippingCost() === 0 ? 'Free' : `$${getShippingCost().toFixed(2)}`}</span>
+                    <span>{getShippingCost() === 0 ? 'Free' : formatINR(getShippingCost())}</span>
                   </div>
                   <div className="total-row">
                     <span>Tax:</span>
-                    <span>${getTax().toFixed(2)}</span>
+                    <span>{formatINR(getTax())}</span>
                   </div>
                   <div className="total-row total-final">
                     <span>Total:</span>
-                    <span>${getFinalTotal().toFixed(2)}</span>
+                    <span>{formatINR(getFinalTotal())}</span>
                   </div>
                 </div>
               </div>

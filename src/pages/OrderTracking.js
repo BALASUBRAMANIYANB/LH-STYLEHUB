@@ -63,7 +63,11 @@ const OrderTracking = () => {
   };
 
   const formatPrice = (price) => {
-    return `$${price.toFixed(2)}`;
+    try {
+      return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(price);
+    } catch {
+      return `₹${Number(price).toFixed(2)}`;
+    }
   };
 
   const formatDate = (dateString) => {

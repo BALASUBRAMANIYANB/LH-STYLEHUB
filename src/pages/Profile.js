@@ -328,7 +328,7 @@ const Profile = () => {
                               <div className="item-info">
                                 <h5>{item.name}</h5>
                                 <p>Size: {item.selectedSize} | Qty: {item.quantity}</p>
-                                <p className="item-price">${item.price}</p>
+                                <p className="item-price">{formatCurrency(item.price)}</p>
                               </div>
                             </div>
                           ))}

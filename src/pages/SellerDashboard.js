@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { ref, get, getDatabase } from "firebase/database";
+import { ref, get, getDatabase, update } from "firebase/database";
 import { getApp } from "firebase/app";
 
 const fetchAllOrders = async () => {
@@ -11,9 +11,15 @@ const fetchAllOrders = async () => {
   if (snapshot.exists()) {
     const users = snapshot.val();
     Object.keys(users).forEach(uid => {
-      if (users[uid].orders) {
-        Object.values(users[uid].orders).forEach(order => {
-          orders.push({ ...order, customer: users[uid].displayName || users[uid].email });
+      const user = users[uid];
+      if (user.orders) {
+        Object.entries(user.orders).forEach(([orderKey, order]) => {
+          orders.push({
+            ...order,
+            uid,
+            orderKey,
+            customer: user.displayName || user.email
+          });
         });
       }
     });
@@ -25,6 +31,68 @@ const fetchAllOrders = async () => {
 const SellerDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [shipmentEdits, setShipmentEdits] = useState({});
+
+  const handleEditChange = (orderKey, field, value) => {
+    setShipmentEdits(prev => ({
+      ...prev,
+      [orderKey]: {
+        ...(prev[orderKey] || {}),
+        [field]: value
+      }
+    }));
+  };
+
+  const saveShipment = async (order) => {
+    try {
+      const db = getDatabase(getApp());
+      const edits = shipmentEdits[order.orderKey] || {};
+      const payload = {
+        awb: edits.awb || '',
+        courier: edits.courier || '',
+        trackingUrl: edits.awb ? `https://shiprocket.co/tracking/${edits.awb}` : '',
+        updatedAt: new Date().toISOString()
+      };
+      await update(ref(db, `users/${order.uid}/orders/${order.orderKey}/shipment`), payload);
+      // Reflect changes locally
+      setOrders(prev => prev.map(o => o.orderKey === order.orderKey ? { ...o, shipment: { ...(o.shipment || {}), ...payload } } : o));
+    } catch (e) {
+      alert('Failed to save shipment details');
+      console.error(e);
+    }
+  };
+
+  const fetchAndSaveTracking = async (order) => {
+    try {
+      const edits = shipmentEdits[order.orderKey] || {};
+      const awb = edits.awb || order.shipment?.awb;
+      if (!awb) {
+        alert('Enter AWB first');
+        return;
+      }
+      const resp = await fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ awb })
+      });
+      if (!resp.ok) {
+        alert('Tracking API request failed');
+        return;
+      }
+      const data = await resp.json();
+      const db = getDatabase(getApp());
+      const payload = {
+        tracking: data,
+        current_status: data.current_status || data.status || '',
+        updatedAt: new Date().toISOString()
+      };
+      await update(ref(db, `users/${order.uid}/orders/${order.orderKey}/shipment`), payload);
+      setOrders(prev => prev.map(o => o.orderKey === order.orderKey ? { ...o, shipment: { ...(o.shipment || {}), ...payload } } : o));
+    } catch (e) {
+      alert('Failed to fetch/save tracking');
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
     fetchAllOrders().then((data) => {
@@ -32,6 +100,18 @@ const SellerDashboard = () => {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    // Initialize editable shipment fields for each order
+    const map = {};
+    orders.forEach(o => {
+      map[o.orderKey] = {
+        awb: o.shipment?.awb || '',
+        courier: o.shipment?.courier || ''
+      };
+    });
+    setShipmentEdits(map);
+  }, [orders]);
 
   return (
     <div className="seller-dashboard" style={{ maxWidth: 900, margin: "0 auto", padding: "2rem" }}>
@@ -50,6 +130,8 @@ const SellerDashboard = () => {
               <th>Total</th>
               <th>Status</th>
               <th>Date</th>
+              <th>Shipment</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -65,6 +147,33 @@ const SellerDashboard = () => {
                 <td>{order.total}</td>
                 <td>{order.status}</td>
                 <td>{order.orderDate}</td>
+                <td>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <input
+                      type="text"
+                      placeholder="AWB"
+                      value={shipmentEdits[order.orderKey]?.awb || ''}
+                      onChange={(e) => handleEditChange(order.orderKey, 'awb', e.target.value)}
+                      style={{ padding: 6, border: '1px solid #ddd', borderRadius: 6 }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Courier"
+                      value={shipmentEdits[order.orderKey]?.courier || ''}
+                      onChange={(e) => handleEditChange(order.orderKey, 'courier', e.target.value)}
+                      style={{ padding: 6, border: '1px solid #ddd', borderRadius: 6 }}
+                    />
+                    {order.shipment?.current_status && (
+                      <small>Current: {order.shipment.current_status}</small>
+                    )}
+                  </div>
+                </td>
+                <td>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <button onClick={() => saveShipment(order)} style={{ padding: '6px 10px' }}>Save Shipment</button>
+                    <button onClick={() => fetchAndSaveTracking(order)} style={{ padding: '6px 10px' }}>Fetch Tracking</button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
