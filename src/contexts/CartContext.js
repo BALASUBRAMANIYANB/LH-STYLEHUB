@@ -1,9 +1,18 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { ref, set, get, onValue } from 'firebase/database';
+import { ref, set, onValue } from 'firebase/database';
 import { useAuth } from './AuthContext';
 import { database } from '../firebase/config';
 
 const CartContext = createContext();
+
+// Shallow-deep equality check to prevent redundant state updates from Firebase listener
+const cartsEqual = (a, b) => {
+  try {
+    return JSON.stringify(a) === JSON.stringify(b);
+  } catch (_) {
+    return false;
+  }
+};
 
 export function useCart() {
   return useContext(CartContext);
@@ -22,15 +31,19 @@ export function CartProvider({ children }) {
         if (snapshot.exists()) {
           const val = snapshot.val();
           console.log('[CartProvider] Cart loaded from Firebase:', val);
+
+          // Normalize incoming value to an array
+          let incomingCart = [];
           if (Array.isArray(val)) {
-            setCart(val.filter(Boolean)); // filter out nulls
+            incomingCart = val.filter(Boolean); // filter out nulls
           } else if (typeof val === 'object' && val !== null) {
-            setCart(Object.values(val));
-          } else {
-            setCart([]);
+            incomingCart = Object.values(val);
           }
+
+          // Avoid redundant state updates to prevent write/read loops
+          setCart(prev => (cartsEqual(prev, incomingCart) ? prev : incomingCart));
         } else {
-          setCart([]);
+          setCart(prev => (prev.length === 0 ? prev : []));
         }
         setLoading(false);
       });
@@ -42,16 +55,7 @@ export function CartProvider({ children }) {
     }
   }, [currentUser]);
 
-  // Save cart to Firebase whenever it changes
-  useEffect(() => {
-    if (currentUser) {
-      console.log('[CartProvider] Writing cart to Firebase:', cart);
-      set(ref(database, `users/${currentUser.uid}/cart`), cart)
-        .then(() => console.log('[CartProvider] Cart write success'))
-        .catch((err) => console.error('[CartProvider] Cart write error', err));
-    }
-  }, [cart, currentUser]);
-
+  
   // Cart actions
   const addToCart = (product, selectedSize) => {
     console.log('[CartProvider] addToCart called. currentUser:', currentUser);
@@ -80,20 +84,44 @@ export function CartProvider({ children }) {
   };
 
   const updateQuantity = (id, selectedSize, quantity) => {
-    setCart(prev =>
-      prev.map(item =>
+    setCart(prev => {
+      const newCart = prev.map(item =>
         item.id === id && item.selectedSize === selectedSize
           ? { ...item, quantity }
           : item
-      )
-    );
+      );
+      if (currentUser) {
+        set(ref(database, `users/${currentUser.uid}/cart`), newCart)
+          .then(() => console.log('[CartProvider] Cart write success (updateQuantity)', newCart))
+          .catch((err) => console.error('[CartProvider] Cart write error (updateQuantity)', err));
+      }
+      return newCart;
+    });
   };
 
   const removeItem = (id, selectedSize) => {
-    setCart(prev => prev.filter(item => !(item.id === id && item.selectedSize === selectedSize)));
+    setCart(prev => {
+      const newCart = prev.filter(item => !(item.id === id && item.selectedSize === selectedSize));
+      if (currentUser) {
+        set(ref(database, `users/${currentUser.uid}/cart`), newCart)
+          .then(() => console.log('[CartProvider] Cart write success (removeItem)', newCart))
+          .catch((err) => console.error('[CartProvider] Cart write error (removeItem)', err));
+      }
+      return newCart;
+    });
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart(prev => {
+      const newCart = [];
+      if (currentUser) {
+        set(ref(database, `users/${currentUser.uid}/cart`), newCart)
+          .then(() => console.log('[CartProvider] Cart write success (clearCart)', newCart))
+          .catch((err) => console.error('[CartProvider] Cart write error (clearCart)', err));
+      }
+      return newCart;
+    });
+  };
 
   const value = {
     cart,
