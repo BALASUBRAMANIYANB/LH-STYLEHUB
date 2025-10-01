@@ -13,7 +13,7 @@ const firebaseConfig = {
   messagingSenderId: "779597144222",
   appId: "1:779597144222:web:0524b254dea2759c709b8f",
   measurementId: "G-W93HVQ63SH",
-  databaseURL: "https://cafe-billing-96901-default-rtdb.firebaseio.com"
+  databaseURL: "https://lhstylehub-2c188-default-rtdb.firebaseio.com"
 };
 
 const app = initializeApp(firebaseConfig);
