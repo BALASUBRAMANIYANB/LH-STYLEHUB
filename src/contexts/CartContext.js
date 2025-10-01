@@ -24,7 +24,15 @@ export function CartProvider({ children }) {
     const cartRef = ref(database, `users/${currentUser.uid}/cart`);
     const unsubscribe = onValue(cartRef, (snapshot) => {
       if (snapshot.exists()) {
-        setCart(snapshot.val());
+        const val = snapshot.val();
+        console.log('[CartProvider] Cart loaded from Firebase:', val);
+        if (Array.isArray(val)) {
+          setCart(val.filter(Boolean)); // filter out nulls
+        } else if (typeof val === 'object' && val !== null) {
+          setCart(Object.values(val));
+        } else {
+          setCart([]);
+        }
       } else {
         setCart([]);
       }
@@ -36,7 +44,10 @@ export function CartProvider({ children }) {
   // Save cart to Firebase whenever it changes
   useEffect(() => {
     if (currentUser) {
-      set(ref(database, `users/${currentUser.uid}/cart`), cart);
+      console.log('[CartProvider] Writing cart to Firebase:', cart);
+      set(ref(database, `users/${currentUser.uid}/cart`), cart)
+        .then(() => console.log('[CartProvider] Cart write success'))
+        .catch((err) => console.error('[CartProvider] Cart write error', err));
     }
   }, [cart, currentUser]);
 
