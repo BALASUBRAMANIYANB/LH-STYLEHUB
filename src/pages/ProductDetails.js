@@ -17,7 +17,7 @@ const ProductDetails = ({ addToCart }) => {
     1: {
       id: 1,
       name: 'OVERSIZED DAMN TEE',
-      subtitle: 'THE CULTURE GLITCH',
+      subtitle: 'KENRICK LAMAR',
       price: 749,
       originalPrice: 999,
       images: [
@@ -179,11 +179,12 @@ const ProductDetails = ({ addToCart }) => {
     }
     addToCart({
       ...product,
-      image: product.images[0], // Use first image for cart
+      image: product.images[0],
       selectedSize,
       quantity
-    });
+    }, selectedSize);
     alert(`${product.name} (Size: ${selectedSize}) added to cart!`);
+    window.location.href = '/cart';
   };
 
   const handleShare = () => {
