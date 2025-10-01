@@ -51,7 +51,8 @@ export function AuthProvider({ children }) {
         phone,
         displayName: `${firstName} ${lastName}`,
         createdAt: new Date().toISOString(),
-        orders: []
+        orders: [],
+        isAdmin: false // Default to false; set to true manually for admin users
       };
 
       await set(ref(database, `users/${user.uid}`), userProfileData);
@@ -156,9 +157,13 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
+  // Helper: is current user admin?
+  const isAdmin = userProfile && userProfile.isAdmin === true;
+
   const value = {
     currentUser,
     userProfile,
+    isAdmin,
     signup,
     login,
     logout,

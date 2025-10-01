@@ -19,7 +19,7 @@ const Footer = () => {
               Crafted with 220 GSM premium combed cotton and high-quality DTF prints.
             </p>
             <div className="social-links">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <a href="https://www.instagram.com/lh_stylehub?igsh=MXN5c25rN3F6bzM4Yw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <FaInstagram />
               </a>
               <a href="https://wa.me/9791999113" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
