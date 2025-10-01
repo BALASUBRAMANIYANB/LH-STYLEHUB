@@ -16,29 +16,30 @@ export function CartProvider({ children }) {
 
   // Load cart from Firebase when user logs in
   useEffect(() => {
-    if (!currentUser) {
-      setCart([]);
-      setLoading(false);
-      return;
-    }
-    const cartRef = ref(database, `users/${currentUser.uid}/cart`);
-    const unsubscribe = onValue(cartRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const val = snapshot.val();
-        console.log('[CartProvider] Cart loaded from Firebase:', val);
-        if (Array.isArray(val)) {
-          setCart(val.filter(Boolean)); // filter out nulls
-        } else if (typeof val === 'object' && val !== null) {
-          setCart(Object.values(val));
+    if (currentUser) {
+      const cartRef = ref(database, `users/${currentUser.uid}/cart`);
+      const unsubscribe = onValue(cartRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const val = snapshot.val();
+          console.log('[CartProvider] Cart loaded from Firebase:', val);
+          if (Array.isArray(val)) {
+            setCart(val.filter(Boolean)); // filter out nulls
+          } else if (typeof val === 'object' && val !== null) {
+            setCart(Object.values(val));
+          } else {
+            setCart([]);
+          }
         } else {
           setCart([]);
         }
-      } else {
-        setCart([]);
-      }
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    } else {
+      // Only clear cart if user logs out
+      setCart([]);
       setLoading(false);
-    });
-    return () => unsubscribe();
+    }
   }, [currentUser]);
 
   // Save cart to Firebase whenever it changes
