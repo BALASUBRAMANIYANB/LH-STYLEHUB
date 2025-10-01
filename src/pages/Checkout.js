@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { createOrder } from '../utils/orderUtils';
@@ -21,7 +22,8 @@ const loadRazorpayScript = () => {
   });
 };
 
-const Checkout = ({ cartItems, onOrderComplete, onClearCart }) => {
+const Checkout = ({ onOrderComplete }) => {
+  const { cart, clearCart } = useCart();
   // Razorpay payment handler
   const handleRazorpayPayment = async () => {
     setLoading(true);
@@ -82,7 +84,7 @@ const Checkout = ({ cartItems, onOrderComplete, onClearCart }) => {
   };
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
   const getShippingCost = () => {
@@ -105,7 +107,7 @@ const Checkout = ({ cartItems, onOrderComplete, onClearCart }) => {
       return;
     }
 
-    if (cartItems.length === 0) {
+    if (cart.length === 0) {
       setError('Your cart is empty');
       return;
     }
@@ -115,17 +117,15 @@ const Checkout = ({ cartItems, onOrderComplete, onClearCart }) => {
 
     try {
       // Create order object
-      const order = createOrder(cartItems, userProfile, shippingInfo);
+  const order = createOrder(cart, userProfile, shippingInfo);
       
-      // Add order to user's order history
-      await addOrder(currentUser.uid, order);
-      
-      // Clear cart and redirect to order confirmation
-      onOrderComplete(order);
-      onClearCart();
-      
-      // Navigate to profile page to show order
-      navigate('/profile');
+  // Add order to user's order history
+  await addOrder(currentUser.uid, order);
+  // Only clear cart after successful order
+  clearCart();
+  onOrderComplete && onOrderComplete(order);
+  // Navigate to profile page to show order
+  navigate('/profile');
     } catch (error) {
       console.error('Error creating order:', error);
       setError('Failed to create order. Please try again.');
@@ -154,7 +154,7 @@ const Checkout = ({ cartItems, onOrderComplete, onClearCart }) => {
     );
   }
 
-  if (cartItems.length === 0) {
+  if (cart.length === 0) {
     return (
       <div className="checkout-container">
         <div className="checkout-content">
