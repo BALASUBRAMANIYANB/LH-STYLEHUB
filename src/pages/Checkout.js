@@ -68,7 +68,7 @@ const Checkout = ({ onOrderComplete }) => {
     setLoading(false);
   };
   const navigate = useNavigate();
-  const { currentUser, userProfile, addOrder } = useAuth();
+  const { currentUser, userProfile, addOrder, updateOrder } = useAuth();
   const [shippingInfo, setShippingInfo] = useState({
     firstName: userProfile?.firstName || '',
     lastName: userProfile?.lastName || '',
@@ -133,6 +133,35 @@ const Checkout = ({ onOrderComplete }) => {
       if (!orderKey) {
         throw new Error('Order save failed');
       }
+
+      // Automatically create shipment on Shiprocket
+      try {
+        const shipmentResponse = await fetch('/api/create-shipment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order: { ...order, id: orderKey } })
+        });
+        if (shipmentResponse.ok) {
+          const shipmentData = await shipmentResponse.json();
+          // Update order with shipment details
+          const shipmentUpdate = {
+            shipment: {
+              awb: shipmentData.awb_code || shipmentData.awb,
+              shipmentId: shipmentData.shipment_id || shipmentData.order_id,
+              courier: shipmentData.courier_name || 'Shiprocket',
+              trackingUrl: shipmentData.track_url || `https://shiprocket.co/tracking/${shipmentData.awb_code}`,
+              createdAt: new Date().toISOString()
+            }
+          };
+          await updateOrder(currentUser.uid, orderKey, shipmentUpdate);
+        } else {
+          console.error('Shipment creation failed:', await shipmentResponse.text());
+        }
+      } catch (shipmentError) {
+        console.error('Error creating shipment:', shipmentError);
+        // Don't fail the order if shipment creation fails
+      }
+
       // Persist a backup for confirmation page
       try { sessionStorage.setItem('lastOrder', JSON.stringify({ ...order, id: orderKey })); } catch {}
       // Clear cart only after order saved

@@ -35,4 +35,16 @@ router.post('/track', async (req, res) => {
   }
 });
 
+router.post('/create-shipment', async (req, res) => {
+  const { order } = req.body;
+  if (!order) return res.status(400).json({ error: 'Order data required' });
+  try {
+    const { createShipment } = require('./src/utils/shiprocketTracking');
+    const shipmentData = await createShipment(order);
+    res.json(shipmentData);
+  } catch (err) {
+    res.status(500).json({ error: 'Shipment creation failed', details: err.message });
+  }
+});
+
 module.exports = router;

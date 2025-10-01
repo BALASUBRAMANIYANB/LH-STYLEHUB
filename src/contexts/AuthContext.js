@@ -121,6 +121,17 @@ export function AuthProvider({ children }) {
     }
   }
 
+  // ✅ Update Order
+  async function updateOrder(uid, orderKey, updates) {
+    try {
+      await update(ref(database, `users/${uid}/orders/${orderKey}`), updates);
+      return true;
+    } catch (error) {
+      console.error('Error updating order:', error);
+      return false;
+    }
+  }
+
   // ✅ Get Orders
   async function getUserOrders(uid) {
     try {
@@ -172,6 +183,7 @@ export function AuthProvider({ children }) {
     getUserProfile,
     updateUserProfile,
     addOrder,
+    updateOrder,
     getUserOrders,
     signInWithGoogle // ✅ Google Login exposed here
   };
