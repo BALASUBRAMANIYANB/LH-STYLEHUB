@@ -22,6 +22,7 @@ import Profile from './pages/Profile';
 import Checkout from './pages/Checkout';
 import TermsConditions from './pages/TermsConditions';
 import CartSidebar from './components/CartSidebar';
+import OrderConfirmation from './pages/OrderConfirmation';
 import './App.css';
 
 
@@ -80,6 +81,7 @@ function AppContent() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/checkout" element={<Checkout cartItems={cart} onOrderComplete={() => {}} onClearCart={clearCart} />} />
             <Route path="/orders" element={<div className="page-placeholder">My Orders Page</div>} />
+            <Route path="/order-confirmation" element={<OrderConfirmation />} />
             <Route path="/seller" element={<RequireAdmin><SellerDashboard /></RequireAdmin>} />
           </Routes>
         </main>
