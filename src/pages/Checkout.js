@@ -350,22 +350,21 @@ const Checkout = ({ onOrderComplete }) => {
                 </div>
               </div>
 
-              {/* Payment Section - Razorpay */}
+
+              {/* Payment Section - COD */}
               <div className="checkout-section">
                 <h2>Payment Information</h2>
                 <div className="payment-placeholder">
                   <FaCreditCard />
-                  <p>Pay securely with Razorpay</p>
+                  <p>Pay with <b>Cash on Delivery (COD)</b></p>
                   <button
-                    type="button"
-                    className="razorpay-btn"
-                    onClick={handleRazorpayPayment}
+                    type="submit"
+                    className="cod-btn"
                     disabled={loading}
-                    style={{marginTop: '1rem', padding: '0.7rem 1.5rem', background: '#f37254', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer'}}
+                    style={{marginTop: '1rem', padding: '0.7rem 1.5rem', background: '#333', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer'}}
                   >
-                    {loading ? 'Processing...' : 'Pay with Razorpay'}
+                    {loading ? 'Placing Order...' : 'Place Order (COD)'}
                   </button>
-                  <small style={{display:'block',marginTop:'0.5rem'}}>Test Key used. Replace with your live Razorpay Key ID for production.</small>
                 </div>
               </div>
 
