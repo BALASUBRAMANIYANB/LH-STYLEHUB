@@ -128,15 +128,18 @@ const Checkout = ({ onOrderComplete }) => {
     try {
       // Create order object
       const order = createOrder(cart, userProfile, shippingInfo);
-      // Persist order
-      await addOrder(currentUser.uid, order);
+      // Persist order and verify success
+      const orderKey = await addOrder(currentUser.uid, order);
+      if (!orderKey) {
+        throw new Error('Order save failed');
+      }
       // Persist a backup for confirmation page
-      try { sessionStorage.setItem('lastOrder', JSON.stringify(order)); } catch {}
+      try { sessionStorage.setItem('lastOrder', JSON.stringify({ ...order, id: orderKey })); } catch {}
       // Clear cart only after order saved
       clearCart();
       onOrderComplete && onOrderComplete(order);
       // Navigate to order confirmation page with state
-      navigate('/order-confirmation', { state: { order } });
+      navigate('/order-confirmation', { state: { order: { ...order, id: orderKey } } });
     } catch (error) {
       console.error('Error creating order:', error);
       setError('Failed to create order. Please try again.');

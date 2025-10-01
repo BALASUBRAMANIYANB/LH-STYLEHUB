@@ -8,7 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup
 } from 'firebase/auth';
-import { ref, set, get, push } from 'firebase/database';
+import { ref, set, get, push, update } from 'firebase/database';
 import { auth, database } from '../firebase/config';
 
 const AuthContext = createContext();
@@ -95,7 +95,7 @@ export function AuthProvider({ children }) {
   // ✅ Update Profile
   async function updateUserProfile(uid, updates) {
     try {
-      await set(ref(database, `users/${uid}`), updates);
+      await update(ref(database, `users/${uid}`), updates);
       return true;
     } catch (error) {
       console.error('Error updating user profile:', error);
@@ -106,12 +106,13 @@ export function AuthProvider({ children }) {
   // ✅ Add Order
   async function addOrder(uid, orderData) {
     try {
-      const orderRef = await push(ref(database, `users/${uid}/orders`), {
+      const payload = {
         ...orderData,
-        orderId: Date.now().toString(),
         orderDate: new Date().toISOString(),
-        status: 'pending'
-      });
+        status: orderData.status || 'pending'
+      };
+      const orderRef = await push(ref(database, `users/${uid}/orders`), payload);
+      console.log('[AuthContext] Order added', { uid, key: orderRef.key, payload });
       return orderRef.key;
     } catch (error) {
       console.error('Error adding order:', error);
