@@ -106,11 +106,12 @@ export function AuthProvider({ children }) {
   // ✅ Add Order
   async function addOrder(uid, orderData) {
     try {
-      const payload = {
+      // Remove undefined to satisfy RTDB validation
+      const payload = JSON.parse(JSON.stringify({
         ...orderData,
         orderDate: new Date().toISOString(),
-        status: orderData.status || 'pending'
-      };
+        status: orderData?.status || 'pending'
+      }));
       const orderRef = await push(ref(database, `users/${uid}/orders`), payload);
       console.log('[AuthContext] Order added', { uid, key: orderRef.key, payload });
       return orderRef.key;

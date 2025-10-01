@@ -1,32 +1,56 @@
 // Utility functions for order management
 
+const safe = (v, fallback = '') => (v === undefined || v === null ? fallback : v);
+const sanitize = (obj) => {
+  try {
+    // Remove undefined recursively; Firebase doesn't accept undefined
+    return JSON.parse(JSON.stringify(obj));
+  } catch {
+    return obj;
+  }
+};
+
 export const createOrder = (cartItems, userInfo, shippingAddress) => {
   const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+  const safeUser = {
+    firstName: safe(userInfo?.firstName, ''),
+    lastName: safe(userInfo?.lastName, ''),
+    email: safe(userInfo?.email, ''),
+    phone: safe(userInfo?.phone, '')
+  };
+
+  const safeAddress = {
+    firstName: safe(shippingAddress?.firstName, safeUser.firstName),
+    lastName: safe(shippingAddress?.lastName, safeUser.lastName),
+    email: safe(shippingAddress?.email, safeUser.email),
+    phone: safe(shippingAddress?.phone, safeUser.phone),
+    address: safe(shippingAddress?.address, ''),
+    city: safe(shippingAddress?.city, ''),
+    state: safe(shippingAddress?.state, ''),
+    zipCode: safe(shippingAddress?.zipCode, ''),
+    country: safe(shippingAddress?.country, 'India')
+  };
   
   const order = {
     orderId,
-    items: cartItems.map(item => ({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      selectedSize: item.selectedSize,
-      quantity: item.quantity,
-      image: item.image
+    items: (cartItems || []).map(item => ({
+      id: safe(item.id, ''),
+      name: safe(item.name, ''),
+      price: Number(item.price) || 0,
+      selectedSize: safe(item.selectedSize, ''),
+      quantity: Number(item.quantity) || 1,
+      image: safe(item.image, '')
     })),
-    total: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+    total: (cartItems || []).reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0),
     status: 'pending',
-    userInfo: {
-      firstName: userInfo.firstName,
-      lastName: userInfo.lastName,
-      email: userInfo.email,
-      phone: userInfo.phone
-    },
-    shippingAddress,
+    userInfo: safeUser,
+    shippingAddress: safeAddress,
     orderDate: new Date().toISOString(),
     estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
   };
 
-  return order;
+  return sanitize(order);
 };
 
 export const getOrderStatusColor = (status) => {
