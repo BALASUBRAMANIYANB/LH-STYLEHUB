@@ -24,7 +24,7 @@ import CartSidebar from './components/CartSidebar';
 import './App.css';
 
 
-function App() {
+function AppContent() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPromo, setCurrentPromo] = useState(0);
@@ -42,10 +42,8 @@ function App() {
   const getCartTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
   return (
-    <AuthProvider>
-      <CartProvider>
-      <Router>
-        <div className="App">
+    <Router>
+      <div className="App">
         {/* Promotional Banner */}
         <div className="promo-banner">
           <div className="promo-slideshow">
@@ -105,7 +103,17 @@ function App() {
           }}
         />
       </div>
-      </Router>
+    </Router>
+  );
+}
+
+
+// App component wraps AppContent with AuthProvider and CartProvider
+function App() {
+  return (
+    <AuthProvider>
+      <CartProvider>
+        <AppContent />
       </CartProvider>
     </AuthProvider>
   );

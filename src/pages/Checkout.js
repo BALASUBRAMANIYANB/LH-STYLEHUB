@@ -193,7 +193,7 @@ const Checkout = ({ onOrderComplete }) => {
           <div className="checkout-section">
             <h2>Order Summary</h2>
             <div className="order-items">
-              {cartItems.map((item, index) => (
+              {cart.map((item, index) => (
                 <div key={`${item.id}-${item.selectedSize}-${index}`} className="order-item">
                   <img 
                     src={item.image} 
