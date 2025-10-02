@@ -33,6 +33,7 @@ const SellerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [shipmentEdits, setShipmentEdits] = useState({});
+  const [statusEdits, setStatusEdits] = useState({});
 
   const handleEditChange = (orderKey, field, value) => {
     setShipmentEdits(prev => ({
@@ -95,6 +96,54 @@ const SellerDashboard = () => {
     }
   };
 
+  const updateOrderStatus = async (order, newStatus) => {
+    try {
+      const db = getDatabase(getApp());
+      await update(ref(db, `users/${order.uid}/orders/${order.orderKey}`), {
+        status: newStatus,
+        updatedAt: new Date().toISOString()
+      });
+      setOrders(prev => prev.map(o => o.orderKey === order.orderKey ? { ...o, status: newStatus } : o));
+      alert(`Order status updated to ${newStatus}`);
+    } catch (e) {
+      alert('Failed to update order status');
+      console.error(e);
+    }
+  };
+
+  const cancelOrder = async (order) => {
+    if (!confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      const db = getDatabase(getApp());
+      await update(ref(db, `users/${order.uid}/orders/${order.orderKey}`), {
+        status: 'cancelled',
+        cancelledAt: new Date().toISOString(),
+        cancelReason: 'Cancelled by seller'
+      });
+      setOrders(prev => prev.map(o => o.orderKey === order.orderKey ? { ...o, status: 'cancelled' } : o));
+      alert('Order cancelled successfully');
+    } catch (e) {
+      alert('Failed to cancel order');
+      console.error(e);
+    }
+  };
+
+  const handleStatusChange = (orderKey, newStatus) => {
+    setStatusEdits(prev => ({
+      ...prev,
+      [orderKey]: newStatus
+    }));
+  };
+
+  const saveStatusChange = async (order) => {
+    const newStatus = statusEdits[order.orderKey];
+    if (newStatus && newStatus !== order.status) {
+      await updateOrderStatus(order, newStatus);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -112,14 +161,17 @@ const SellerDashboard = () => {
 
   useEffect(() => {
     // Initialize editable shipment fields for each order
-    const map = {};
+    const shipmentMap = {};
+    const statusMap = {};
     orders.forEach(o => {
-      map[o.orderKey] = {
+      shipmentMap[o.orderKey] = {
         awb: o.shipment?.awb || '',
         courier: o.shipment?.courier || ''
       };
+      statusMap[o.orderKey] = o.status || 'pending';
     });
-    setShipmentEdits(map);
+    setShipmentEdits(shipmentMap);
+    setStatusEdits(statusMap);
   }, [orders]);
 
   return (
@@ -158,7 +210,27 @@ const SellerDashboard = () => {
                   ))}
                 </td>
                 <td>{order.total}</td>
-                <td>{order.status}</td>
+                <td>
+                  <select
+                    value={statusEdits[order.orderKey] || order.status}
+                    onChange={(e) => handleStatusChange(order.orderKey, e.target.value)}
+                    style={{ padding: 4, border: '1px solid #ddd', borderRadius: 4 }}
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                  {statusEdits[order.orderKey] !== order.status && (
+                    <button
+                      onClick={() => saveStatusChange(order)}
+                      style={{ marginLeft: 8, padding: '2px 8px', fontSize: '12px' }}
+                    >
+                      Save
+                    </button>
+                  )}
+                </td>
                 <td>{order.orderDate}</td>
                 <td>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -185,6 +257,14 @@ const SellerDashboard = () => {
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     <button onClick={() => saveShipment(order)} style={{ padding: '6px 10px' }}>Save Shipment</button>
                     <button onClick={() => fetchAndSaveTracking(order)} style={{ padding: '6px 10px' }}>Fetch Tracking</button>
+                    {order.status !== 'cancelled' && order.status !== 'delivered' && (
+                      <button
+                        onClick={() => cancelOrder(order)}
+                        style={{ padding: '6px 10px', background: '#dc3545', color: 'white', border: 'none', borderRadius: 4 }}
+                      >
+                        Cancel Order
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
