@@ -319,7 +319,6 @@ const SellerDashboard = () => {
   const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
   const pendingOrders = orders.filter(order => order.status === 'pending').length;
   const shippedOrders = orders.filter(order => order.status === 'shipped').length;
-  const deliveredOrders = orders.filter(order => order.status === 'delivered').length;
 
   const getStatusColor = (status) => {
     switch (status) {
