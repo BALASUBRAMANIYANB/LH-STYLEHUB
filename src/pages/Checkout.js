@@ -44,15 +44,15 @@ const Checkout = ({ onOrderComplete }) => {
     }
     // Ideally, order details should come from backend for security
     const options = {
-      key: 'rzp_test_YourKeyHere', // Replace with your Razorpay Key ID
+      key: process.env.REACT_APP_RAZORPAY_KEY_ID, // Razorpay Key ID from environment
       amount: Math.round(getFinalTotal() * 100), // Amount in paise
       currency: 'INR',
       name: 'LH STYLEHUB',
       description: 'Order Payment',
       image: '/images/Logo/LH_Logo_White-01.png',
       handler: function (response) {
-        // On successful payment
-        handleSubmit();
+        // On successful payment, process the order
+        processOrderAfterPayment();
       },
       prefill: {
         name: shippingInfo.firstName + ' ' + shippingInfo.lastName,
@@ -82,6 +82,7 @@ const Checkout = ({ onOrderComplete }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cod'); // 'online' or 'cod'
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -109,25 +110,12 @@ const Checkout = ({ onOrderComplete }) => {
     return getCartTotal() + getShippingCost() + getTax();
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!currentUser) {
-      setError('Please log in to complete your order');
-      return;
-    }
-
-    if (cart.length === 0) {
-      setError('Your cart is empty');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
+  const processOrderAfterPayment = async () => {
     try {
       // Create order object
       const order = createOrder(cart, userProfile, shippingInfo);
+      order.paymentMethod = paymentMethod; // Add payment method to order
+
       // Persist order and verify success
       const orderKey = await addOrder(currentUser.uid, order);
       if (!orderKey) {
@@ -154,12 +142,36 @@ const Checkout = ({ onOrderComplete }) => {
             }
           };
           await updateOrder(currentUser.uid, orderKey, shipmentUpdate);
+          // Update order object for emails
+          order.shipment = shipmentUpdate.shipment;
         } else {
           console.error('Shipment creation failed:', await shipmentResponse.text());
         }
       } catch (shipmentError) {
         console.error('Error creating shipment:', shipmentError);
         // Don't fail the order if shipment creation fails
+      }
+
+      // Send order confirmation email to customer
+      try {
+        await fetch('/api/send-order-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order })
+        });
+      } catch (emailError) {
+        console.error('Error sending order confirmation email:', emailError);
+      }
+
+      // Send notification email to seller/admin
+      try {
+        await fetch('/api/send-seller-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order, customerEmail: currentUser.email })
+        });
+      } catch (emailError) {
+        console.error('Error sending seller notification email:', emailError);
       }
 
       // Persist a backup for confirmation page
@@ -174,6 +186,31 @@ const Checkout = ({ onOrderComplete }) => {
       setError('Failed to create order. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!currentUser) {
+      setError('Please log in to complete your order');
+      return;
+    }
+
+    if (cart.length === 0) {
+      setError('Your cart is empty');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    if (paymentMethod === 'online') {
+      // Handle online payment with Razorpay
+      await handleRazorpayPayment();
+    } else {
+      // Handle COD - proceed directly
+      await processOrderAfterPayment();
     }
   };
 
@@ -394,21 +431,53 @@ const Checkout = ({ onOrderComplete }) => {
               </div>
 
 
-              {/* Payment Section - COD */}
+              {/* Payment Section */}
               <div className="checkout-section">
                 <h2>Payment Information</h2>
-                <div className="payment-placeholder">
-                  <FaCreditCard />
-                  <p>Pay with <b>Cash on Delivery (COD)</b></p>
-                  <button
-                    type="submit"
-                    className="cod-btn"
-                    disabled={loading}
-                    style={{marginTop: '1rem', padding: '0.7rem 1.5rem', background: '#333', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer'}}
-                  >
-                    {loading ? 'Placing Order...' : 'Place Order (COD)'}
-                  </button>
+                <div className="payment-methods">
+                  <div className="payment-method">
+                    <input
+                      type="radio"
+                      id="online"
+                      name="paymentMethod"
+                      value="online"
+                      checked={paymentMethod === 'online'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
+                    <label htmlFor="online">
+                      <FaCreditCard />
+                      <div>
+                        <strong>Online Payment</strong>
+                        <p>Pay securely with Razorpay</p>
+                      </div>
+                    </label>
+                  </div>
+                  <div className="payment-method">
+                    <input
+                      type="radio"
+                      id="cod"
+                      name="paymentMethod"
+                      value="cod"
+                      checked={paymentMethod === 'cod'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
+                    <label htmlFor="cod">
+                      <FaLock />
+                      <div>
+                        <strong>Cash on Delivery (COD)</strong>
+                        <p>Pay when you receive your order</p>
+                      </div>
+                    </label>
+                  </div>
                 </div>
+                <button
+                  type="submit"
+                  className="place-order-btn"
+                  disabled={loading}
+                  style={{marginTop: '1rem', padding: '0.7rem 1.5rem', background: '#333', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', width: '100%'}}
+                >
+                  {loading ? 'Processing...' : paymentMethod === 'online' ? 'Pay Now' : 'Place Order (COD)'}
+                </button>
               </div>
 
               {/* Order Total */}

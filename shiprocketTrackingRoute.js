@@ -47,4 +47,28 @@ router.post('/create-shipment', async (req, res) => {
   }
 });
 
+router.post('/send-order-confirmation', async (req, res) => {
+  const { order } = req.body;
+  if (!order) return res.status(400).json({ error: 'Order data required' });
+  try {
+    const { sendOrderConfirmation } = require('./src/utils/emailService');
+    await sendOrderConfirmation(order);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Email send failed', details: err.message });
+  }
+});
+
+router.post('/send-seller-notification', async (req, res) => {
+  const { order, customerEmail } = req.body;
+  if (!order) return res.status(400).json({ error: 'Order data required' });
+  try {
+    const { sendSellerNotification } = require('./src/utils/emailService');
+    await sendSellerNotification(order, customerEmail);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Email send failed', details: err.message });
+  }
+});
+
 module.exports = router;
