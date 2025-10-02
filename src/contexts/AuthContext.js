@@ -27,7 +27,33 @@ export function AuthProvider({ children }) {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      return result.user;
+      const user = result.user;
+
+      // Check if user profile exists in database, if not create it
+      const existingProfile = await getUserProfile(user.uid);
+      if (!existingProfile) {
+        // Extract name from displayName
+        const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        const userProfileData = {
+          uid: user.uid,
+          email: user.email,
+          firstName,
+          lastName,
+          phone: '', // Google doesn't provide phone
+          displayName: user.displayName || user.email,
+          createdAt: new Date().toISOString(),
+          orders: [],
+          isAdmin: false,
+          provider: 'google'
+        };
+
+        await set(ref(database, `users/${user.uid}`), userProfileData);
+      }
+
+      return user;
     } catch (error) {
       throw error;
     }
@@ -100,6 +126,61 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error('Error updating user profile:', error);
       return false;
+    }
+  }
+
+  // ✅ Populate Missing User Profiles (for existing Google users)
+  async function populateUserProfiles() {
+    try {
+      const usersRef = ref(database, 'users');
+      const snapshot = await get(usersRef);
+
+      if (snapshot.exists()) {
+        const users = snapshot.val();
+        const updates = {};
+
+        for (const [uid, userData] of Object.entries(users)) {
+          // Check if user has profile data
+          if (!userData.email || !userData.displayName) {
+            // Try to get user info from Firebase Auth
+            try {
+              // Note: This requires admin SDK in production
+              // For now, we'll create basic profile from available data
+              const basicProfile = {
+                uid,
+                email: userData.email || '',
+                firstName: userData.firstName || '',
+                lastName: userData.lastName || '',
+                phone: userData.phone || '',
+                displayName: userData.displayName || userData.email || `User ${uid.substring(0, 8)}`,
+                createdAt: userData.createdAt || new Date().toISOString(),
+                orders: userData.orders || [],
+                isAdmin: userData.isAdmin || false,
+                provider: userData.provider || 'unknown'
+              };
+
+              // Only update if we have meaningful data to add
+              if (!userData.displayName || !userData.email) {
+                updates[`users/${uid}`] = { ...userData, ...basicProfile };
+              }
+            } catch (authError) {
+              console.log(`Could not get auth data for ${uid}:`, authError);
+            }
+          }
+        }
+
+        // Apply all updates
+        if (Object.keys(updates).length > 0) {
+          await update(ref(database), updates);
+          console.log(`Updated ${Object.keys(updates).length} user profiles`);
+          return Object.keys(updates).length;
+        }
+      }
+
+      return 0;
+    } catch (error) {
+      console.error('Error populating user profiles:', error);
+      return 0;
     }
   }
 
@@ -182,6 +263,7 @@ export function AuthProvider({ children }) {
     logout,
     getUserProfile,
     updateUserProfile,
+    populateUserProfiles,
     addOrder,
     updateOrder,
     getUserOrders,

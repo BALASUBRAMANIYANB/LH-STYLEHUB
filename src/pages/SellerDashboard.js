@@ -1,7 +1,8 @@
 
 import { useEffect, useState } from "react";
-import { ref, get, getDatabase, update } from "firebase/database";
+import { ref, get, getDatabase, update, push } from "firebase/database";
 import { getApp } from "firebase/app";
+import { useAuth } from '../contexts/AuthContext';
 
 const fetchAllOrders = async () => {
   const db = getDatabase(getApp());
@@ -42,6 +43,7 @@ const SellerDashboard = () => {
   const [error, setError] = useState('');
   const [shipmentEdits, setShipmentEdits] = useState({});
   const [statusEdits, setStatusEdits] = useState({});
+  const { populateUserProfiles } = useAuth();
 
   const handleEditChange = (orderKey, field, value) => {
     setShipmentEdits(prev => ({
@@ -120,6 +122,7 @@ const SellerDashboard = () => {
   };
 
   const cancelOrder = async (order) => {
+    // eslint-disable-next-line no-restricted-globals
     if (!confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
       return;
     }
@@ -139,9 +142,11 @@ const SellerDashboard = () => {
   };
 
   const deleteOrder = async (order) => {
+    // eslint-disable-next-line no-restricted-globals
     if (!confirm('Are you sure you want to PERMANENTLY DELETE this order? This action cannot be undone and will remove all order data.')) {
       return;
     }
+    // eslint-disable-next-line no-restricted-globals
     if (!confirm('This will permanently delete the order. Are you absolutely sure?')) {
       return;
     }
@@ -245,6 +250,23 @@ const SellerDashboard = () => {
       alert('Order created successfully');
     } catch (e) {
       alert('Failed to create order');
+      console.error(e);
+    }
+  };
+
+  const handlePopulateProfiles = async () => {
+    // eslint-disable-next-line no-restricted-globals
+    if (!confirm('This will populate missing user profile data for all users. Continue?')) {
+      return;
+    }
+
+    try {
+      const count = await populateUserProfiles();
+      alert(`Successfully updated ${count} user profiles`);
+      // Refresh orders to show updated data
+      window.location.reload();
+    } catch (e) {
+      alert('Failed to populate user profiles');
       console.error(e);
     }
   };
@@ -453,25 +475,46 @@ const SellerDashboard = () => {
             </select>
           </div>
 
-          <button
-            onClick={() => setShowAddOrder(!showAddOrder)}
-            style={{
-              padding: '12px 25px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '25px',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
-            onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
-          >
-            {showAddOrder ? '❌ Cancel' : '➕ Add Order'}
-          </button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              onClick={handlePopulateProfiles}
+              style={{
+                padding: '12px 20px',
+                background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(40, 167, 69, 0.4)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+              onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+            >
+              🔧 Fix User Data
+            </button>
+            <button
+              onClick={() => setShowAddOrder(!showAddOrder)}
+              style={{
+                padding: '12px 25px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+              onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+            >
+              {showAddOrder ? '❌ Cancel' : '➕ Add Order'}
+            </button>
+          </div>
         </div>
 
         {/* Add Order Form */}
