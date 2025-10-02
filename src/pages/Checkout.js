@@ -154,13 +154,19 @@ const Checkout = ({ onOrderComplete }) => {
 
       // Automatically create shipment on Shiprocket
       try {
+        console.log('Attempting to create shipment for order:', orderKey);
         const shipmentResponse = await fetch('/api/create-shipment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ order: { ...order, id: orderKey } })
         });
+
+        console.log('Shipment API response status:', shipmentResponse.status);
+
         if (shipmentResponse.ok) {
           const shipmentData = await shipmentResponse.json();
+          console.log('Shipment created successfully:', shipmentData);
+
           // Update order with shipment details
           const shipmentUpdate = {
             shipment: {
@@ -171,15 +177,50 @@ const Checkout = ({ onOrderComplete }) => {
               createdAt: new Date().toISOString()
             }
           };
+
+          console.log('Updating order with shipment data:', shipmentUpdate);
           await updateOrder(currentUser.uid, orderKey, shipmentUpdate);
           // Update order object for emails
           order.shipment = shipmentUpdate.shipment;
+          console.log('Order updated successfully with shipment details');
         } else {
-          console.error('Shipment creation failed:', await shipmentResponse.text());
+          const errorText = await shipmentResponse.text();
+          console.error('Shipment creation failed with status:', shipmentResponse.status, 'Response:', errorText);
+
+          // Create a fallback shipment entry for manual processing
+          const fallbackShipment = {
+            shipment: {
+              awb: 'PENDING',
+              shipmentId: 'MANUAL_PROCESSING',
+              courier: 'To be assigned',
+              trackingUrl: '',
+              createdAt: new Date().toISOString(),
+              status: 'pending_shipment_creation'
+            }
+          };
+
+          console.log('Creating fallback shipment entry:', fallbackShipment);
+          await updateOrder(currentUser.uid, orderKey, fallbackShipment);
+          order.shipment = fallbackShipment.shipment;
         }
       } catch (shipmentError) {
         console.error('Error creating shipment:', shipmentError);
-        // Don't fail the order if shipment creation fails
+
+        // Create a fallback shipment entry for manual processing
+        const fallbackShipment = {
+          shipment: {
+            awb: 'PENDING',
+            shipmentId: 'MANUAL_PROCESSING',
+            courier: 'To be assigned',
+            trackingUrl: '',
+            createdAt: new Date().toISOString(),
+            status: 'pending_shipment_creation'
+          }
+        };
+
+        console.log('Creating fallback shipment entry due to error:', fallbackShipment);
+        await updateOrder(currentUser.uid, orderKey, fallbackShipment);
+        order.shipment = fallbackShipment.shipment;
       }
 
       // Send order confirmation email to customer
