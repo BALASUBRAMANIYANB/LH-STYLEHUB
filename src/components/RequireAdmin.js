@@ -3,7 +3,7 @@ import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 // Admin email for seller dashboard access
-const ADMIN_EMAIL = 'lhstylehub@gmail.com';
+const ADMIN_EMAIL = 'lhstylehub@gmail.com'; // Updated for production
 
 export default function RequireAdmin({ children }) {
   const { currentUser } = useAuth();
