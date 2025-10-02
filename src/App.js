@@ -15,7 +15,6 @@ import Home from './pages/Home';
 import Products from './pages/Products';
 import TShirts from './pages/TShirts';
 import ProductDetails from './pages/ProductDetails';
-import Polo from './pages/Polo';
 import FAQ from './pages/FAQ';
 import Support from './pages/Support';
 import Profile from './pages/Profile';

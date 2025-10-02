@@ -13,39 +13,38 @@ const Profile = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (currentUser) {
-      // Set fallback data from Firebase Auth user
-      const fallbackData = {
-        firstName: currentUser.displayName?.split(' ')[0] || '',
-        lastName: currentUser.displayName?.split(' ').slice(1).join(' ') || '',
-        phone: '',
-        email: currentUser.email || '',
-        createdAt: currentUser.metadata?.creationTime || new Date().toISOString()
-      };
-      
-      // Use userProfile if available, otherwise use fallback
-      const profileData = userProfile || fallbackData;
-      
-      setEditData({
-        firstName: profileData.firstName || '',
-        lastName: profileData.lastName || '',
-        phone: profileData.phone || ''
-      });
-      
-      loadOrders();
-    }
-  }, [currentUser, userProfile]);
+    const loadUserData = async () => {
+      if (currentUser) {
+        // Set fallback data from Firebase Auth user
+        const fallbackData = {
+          firstName: currentUser.displayName?.split(' ')[0] || '',
+          lastName: currentUser.displayName?.split(' ').slice(1).join(' ') || '',
+          phone: '',
+          email: currentUser.email || '',
+          createdAt: currentUser.metadata?.creationTime || new Date().toISOString()
+        };
 
-  const loadOrders = async () => {
-    if (currentUser) {
-      try {
-        const userOrders = await getUserOrders(currentUser.uid);
-        setOrders(userOrders);
-      } catch (error) {
-        console.error('Error loading orders:', error);
+        // Use userProfile if available, otherwise use fallback
+        const profileData = userProfile || fallbackData;
+
+        setEditData({
+          firstName: profileData.firstName || '',
+          lastName: profileData.lastName || '',
+          phone: profileData.phone || ''
+        });
+
+        // Load orders
+        try {
+          const userOrders = await getUserOrders(currentUser.uid);
+          setOrders(userOrders);
+        } catch (error) {
+          console.error('Error loading orders:', error);
+        }
       }
-    }
-  };
+    };
+
+    loadUserData();
+  }, [currentUser, userProfile, getUserOrders]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
