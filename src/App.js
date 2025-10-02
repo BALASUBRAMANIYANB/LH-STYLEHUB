@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SellerDashboard from './pages/SellerDashboard';
 import Cart from './pages/Cart';
 import RequireAdmin from './components/RequireAdmin';
@@ -29,7 +29,6 @@ function AppContent() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPromo, setCurrentPromo] = useState(0);
   const { cart, addToCart, removeItem, updateQuantity, clearCart } = useCart();
-  const navigate = useNavigate();
 
   // Auto-slide promotional offers every 3 seconds
   useEffect(() => {
@@ -101,7 +100,7 @@ function AppContent() {
           cartTotal={getCartTotal()}
           onCheckout={() => {
             setIsCartOpen(false);
-            navigate('/checkout');
+            window.location.href = '/checkout';
           }}
         />
       </div>
