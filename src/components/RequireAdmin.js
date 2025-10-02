@@ -2,8 +2,8 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-// Change this to your admin email
-const ADMIN_EMAIL = 'Lhstylehub@gmail.com';
+// Admin email for seller dashboard access
+const ADMIN_EMAIL = 'harshinisampath1810@gmail.com';
 
 export default function RequireAdmin({ children }) {
   const { currentUser } = useAuth();
