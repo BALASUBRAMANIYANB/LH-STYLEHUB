@@ -37,12 +37,28 @@ router.post('/track', async (req, res) => {
 
 router.post('/create-shipment', async (req, res) => {
   const { order } = req.body;
-  if (!order) return res.status(400).json({ error: 'Order data required' });
+  console.log('Create shipment request received:', { orderId: order?.orderId });
+
+  if (!order) {
+    console.log('No order data provided');
+    return res.status(400).json({ error: 'Order data required' });
+  }
+
   try {
+    console.log('Environment variables check:', {
+      email: process.env.SHIPROCKET_EMAIL ? 'SET' : 'NOT SET',
+      password: process.env.SHIPROCKET_PASSWORD ? 'SET' : 'NOT SET',
+      pickup: process.env.SHIPROCKET_PICKUP_LOCATION,
+      channel: process.env.SHIPROCKET_CHANNEL_ID
+    });
+
     const { createShipment } = require('./src/utils/shiprocketTracking');
+    console.log('Calling createShipment function...');
     const shipmentData = await createShipment(order);
+    console.log('Shipment created successfully:', shipmentData);
     res.json(shipmentData);
   } catch (err) {
+    console.error('Shipment creation error:', err);
     res.status(500).json({ error: 'Shipment creation failed', details: err.message });
   }
 });
