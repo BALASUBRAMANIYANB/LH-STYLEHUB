@@ -12,13 +12,21 @@ const fetchAllOrders = async () => {
     const users = snapshot.val();
     Object.keys(users).forEach(uid => {
       const user = users[uid];
+      // Get user profile info (excluding orders and cart)
+      const userProfile = { ...user };
+      delete userProfile.orders;
+      delete userProfile.cart;
+
       if (user.orders) {
         Object.entries(user.orders).forEach(([orderKey, order]) => {
           orders.push({
             ...order,
             uid,
             orderKey,
-            customer: user.displayName || user.email
+            customer: userProfile.displayName || userProfile.email || `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || 'Unknown Customer',
+            customerEmail: userProfile.email || '',
+            customerPhone: userProfile.phone || '',
+            userProfile: userProfile
           });
         });
       }
@@ -780,7 +788,17 @@ const SellerDashboard = () => {
                       </td>
                       <td style={{ padding: '15px' }}>
                         <div style={{ fontWeight: 'bold', color: '#333' }}>{order.customer}</div>
-                        <div style={{ fontSize: '12px', color: '#666' }}>{order.shippingAddress?.email}</div>
+                        <div style={{ fontSize: '12px', color: '#666' }}>
+                          📧 {order.customerEmail || order.shippingAddress?.email || 'N/A'}
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#666' }}>
+                          📱 {order.customerPhone || order.shippingAddress?.phone || 'N/A'}
+                        </div>
+                        {order.userProfile?.uid && (
+                          <div style={{ fontSize: '10px', color: '#999', marginTop: '4px' }}>
+                            UID: {order.userProfile.uid.substring(0, 8)}...
+                          </div>
+                        )}
                       </td>
                       <td style={{ padding: '15px' }}>
                         {order.items && order.items.map((item, i) => (
