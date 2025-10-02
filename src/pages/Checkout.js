@@ -36,6 +36,15 @@ const Checkout = ({ onOrderComplete }) => {
   const handleRazorpayPayment = async () => {
     setLoading(true);
     setError('');
+    const razorpayKey = process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_live_ROYxFzNDDRuwWs'; // Fallback to direct key
+    console.log('Razorpay Key:', razorpayKey); // Debug log
+
+    if (!razorpayKey) {
+      setError('Razorpay key not configured. Please contact support.');
+      setLoading(false);
+      return;
+    }
+
     const res = await loadRazorpayScript();
     if (!res) {
       setError('Failed to load Razorpay SDK. Please try again.');
@@ -44,7 +53,7 @@ const Checkout = ({ onOrderComplete }) => {
     }
     // Ideally, order details should come from backend for security
     const options = {
-      key: process.env.REACT_APP_RAZORPAY_KEY_ID, // Razorpay Key ID from environment
+      key: razorpayKey, // Razorpay Key ID from environment
       amount: Math.round(getFinalTotal() * 100), // Amount in paise
       currency: 'INR',
       name: 'LH STYLEHUB',
