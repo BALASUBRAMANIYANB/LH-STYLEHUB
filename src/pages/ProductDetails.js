@@ -6,7 +6,6 @@ import './ProductDetails.css';
 const ProductDetails = ({ addToCart }) => {
   const { id } = useParams();
   const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const [showSizeGuide, setShowSizeGuide] = useState(false);

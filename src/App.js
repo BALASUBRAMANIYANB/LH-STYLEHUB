@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SellerDashboard from './pages/SellerDashboard';
 import Cart from './pages/Cart';
 import RequireAdmin from './components/RequireAdmin';
-import { useAuth } from './contexts/AuthContext';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Story from './pages/Story';
 import { AuthProvider } from './contexts/AuthContext';

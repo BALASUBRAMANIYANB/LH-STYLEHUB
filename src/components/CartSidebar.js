@@ -19,10 +19,6 @@ const CartSidebar = ({
     }
   };
 
-  const getItemTotal = (item) => {
-    const price = item.discountPrice || item.price;
-    return price * item.quantity;
-  };
 
   if (!isOpen) return null;
 
