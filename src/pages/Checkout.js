@@ -51,6 +51,17 @@ const Checkout = ({ onOrderComplete }) => {
       setLoading(false);
       return;
     }
+
+    // Override console.error to suppress Razorpay UPI launch errors
+    const originalConsoleError = console.error;
+    console.error = function(...args) {
+      // Suppress specific Razorpay UPI launch errors
+      if (args[0] && typeof args[0] === 'string' &&
+          (args[0].includes('Failed to launch') || args[0].includes('gpay://'))) {
+        return; // Suppress this error
+      }
+      originalConsoleError.apply(console, args);
+    };
     // Ideally, order details should come from backend for security
     const options = {
       key: razorpayKey, // Razorpay Key ID from environment
@@ -70,11 +81,21 @@ const Checkout = ({ onOrderComplete }) => {
       },
       theme: {
         color: '#333'
+      },
+      modal: {
+        ondismiss: function() {
+          console.log('Payment modal dismissed');
+        }
       }
     };
     const rzp = new window.Razorpay(options);
     rzp.open();
     setLoading(false);
+
+    // Restore original console.error after modal closes
+    setTimeout(() => {
+      console.error = originalConsoleError;
+    }, 10000); // Restore after 10 seconds
   };
   const navigate = useNavigate();
   const { currentUser, userProfile, addOrder, updateOrder } = useAuth();
