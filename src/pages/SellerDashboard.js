@@ -93,13 +93,44 @@ const SellerDashboard = () => {
       }
       const data = await resp.json();
       const db = getDatabase(getApp());
+
+      // Map Shiprocket status to order status
+      let newOrderStatus = order.status;
+      const shiprocketStatus = (data.current_status || data.status || '').toLowerCase();
+
+      if (shiprocketStatus.includes('delivered') || shiprocketStatus.includes('completed')) {
+        newOrderStatus = 'delivered';
+      } else if (shiprocketStatus.includes('out for delivery') || shiprocketStatus.includes('out_for_delivery')) {
+        newOrderStatus = 'shipped';
+      } else if (shiprocketStatus.includes('picked') || shiprocketStatus.includes('in transit') || shiprocketStatus.includes('in_transit')) {
+        newOrderStatus = 'shipped';
+      }
+
       const payload = {
         tracking: data,
         current_status: data.current_status || data.status || '',
+        awb: awb, // Ensure AWB is saved
+        courier: data.courier_name || edits.courier || '',
         updatedAt: new Date().toISOString()
       };
+
+      // Update shipment data
       await update(ref(db, `users/${order.uid}/orders/${order.orderKey}/shipment`), payload);
-      setOrders(prev => prev.map(o => o.orderKey === order.orderKey ? { ...o, shipment: { ...(o.shipment || {}), ...payload } } : o));
+
+      // Auto-update order status if it changed
+      if (newOrderStatus !== order.status) {
+        await update(ref(db, `users/${order.uid}/orders/${order.orderKey}`), {
+          status: newOrderStatus,
+          updatedAt: new Date().toISOString()
+        });
+        alert(`Order status automatically updated to "${newOrderStatus}" based on Shiprocket tracking!`);
+      }
+
+      setOrders(prev => prev.map(o => o.orderKey === order.orderKey ? {
+        ...o,
+        status: newOrderStatus,
+        shipment: { ...(o.shipment || {}), ...payload }
+      } : o));
     } catch (e) {
       alert('Failed to fetch/save tracking');
       console.error(e);
