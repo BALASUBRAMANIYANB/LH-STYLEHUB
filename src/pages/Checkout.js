@@ -127,8 +127,8 @@ const Checkout = ({ onOrderComplete }) => {
   };
 
   const getShippingCost = () => {
-    // Free shipping over ₹999, else flat ₹80
-    return getCartTotal() > 999 ? 0 : 80;
+    // Free shipping over ₹999, else flat ₹79
+    return getCartTotal() > 999 ? 0 : 79;
   };
 
   const getTax = () => {
