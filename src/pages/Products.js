@@ -8,7 +8,7 @@ const Products = () => {
     {
       id: 1,
       name: 'OVERSIZED DAMN TEE',
-      subtitle: 'THE CULTURE GLITCH',
+      subtitle: 'KENDRICK LAMAR',
       price: 749,
       originalPrice: 999,
       image: '/images/products/K-1.jpg',

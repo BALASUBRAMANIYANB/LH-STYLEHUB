@@ -16,7 +16,7 @@ const ProductDetails = ({ addToCart }) => {
     1: {
       id: 1,
       name: 'OVERSIZED DAMN TEE',
-      subtitle: 'KENRICK LAMAR',
+      subtitle: 'KENDRICK LAMAR',
       price: 749,
       originalPrice: 999,
       images: [
