@@ -11,7 +11,7 @@ const Home = () => {
       id: 1,
       image: '/images/posters/P-1.jpg',
       title: 'OVERSIZED DAMN TEE',
-      subtitle: 'THE CULTURE GLITCH',
+      subtitle: 'KENDRICK LAMAR',
       description: 'Premium streetwear that speaks your language'
     },
     {
