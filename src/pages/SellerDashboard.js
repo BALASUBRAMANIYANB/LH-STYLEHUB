@@ -850,6 +850,11 @@ const SellerDashboard = () => {
                         <div style={{ fontSize: '12px', color: '#666' }}>
                           📱 {order.customerPhone || order.shippingAddress?.phone || 'N/A'}
                         </div>
+                        {order.shippingAddress && (
+                          <div style={{ fontSize: '11px', color: '#555', marginTop: '4px', lineHeight: '1.3' }}>
+                            📍 {order.shippingAddress.address}, {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
+                          </div>
+                        )}
                         {order.userProfile?.uid && (
                           <div style={{ fontSize: '10px', color: '#999', marginTop: '4px' }}>
                             UID: {order.userProfile.uid.substring(0, 8)}...
