@@ -140,6 +140,8 @@
 .info-value {
   font-weight: 500;
   color: #333;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Edit Form */
