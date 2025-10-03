@@ -1,6 +1,8 @@
 import React from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { FaShoppingCart, FaTrash, FaArrowRight, FaMinus, FaPlus } from 'react-icons/fa';
+import './Cart.css';
 
 const Cart = () => {
   const { cart, updateQuantity, removeItem } = useCart();
@@ -11,8 +13,14 @@ const Cart = () => {
   if (cart.length === 0) {
     return (
       <div className="cart-page-container">
-        <h2>Your cart is empty</h2>
-        <button onClick={() => navigate('/products')}>Continue Shopping</button>
+        <div className="cart-empty">
+          <FaShoppingCart />
+          <h2>Your cart is empty</h2>
+          <p>Add some items to your cart before proceeding</p>
+          <button className="continue-shopping-btn" onClick={() => navigate('/t-shirts')}>
+            <FaArrowRight /> Continue Shopping
+          </button>
+        </div>
       </div>
     );
   }
@@ -23,24 +31,53 @@ const Cart = () => {
       <div className="cart-items-list">
         {cart.map((item, index) => (
           <div key={`${item.id}-${item.selectedSize}-${index}`} className="cart-item-row">
-            <img src={item.image} alt={item.name} style={{ width: 60, height: 60, objectFit: 'cover' }} />
+            <img
+              src={item.image}
+              alt={item.name}
+              className="cart-item-image"
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/80x80?text=Image';
+              }}
+            />
             <div className="cart-item-info">
-              <div><b>{item.name}</b></div>
-              <div>Size: {item.selectedSize}</div>
-              <div>Qty: 
-                <button onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity - 1)} disabled={item.quantity <= 1}>-</button>
-                <span style={{ margin: '0 8px' }}>{item.quantity}</span>
-                <button onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity + 1)}>+</button>
+              <h3 className="cart-item-name">{item.name}</h3>
+              <div className="cart-item-details">
+                <div>Size: {item.selectedSize}</div>
+                <div className="cart-quantity-controls">
+                  <span>Qty:</span>
+                  <button
+                    className="quantity-btn"
+                    onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity - 1)}
+                    disabled={item.quantity <= 1}
+                  >
+                    <FaMinus />
+                  </button>
+                  <span className="quantity-value">{item.quantity}</span>
+                  <button
+                    className="quantity-btn"
+                    onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity + 1)}
+                  >
+                    <FaPlus />
+                  </button>
+                </div>
+                <div className="cart-item-price">
+                  Rs. {item.price.toLocaleString()} x {item.quantity} = Rs. {(item.price * item.quantity).toLocaleString()}
+                </div>
               </div>
-              <div>Price: Rs. {item.price} x {item.quantity} = <b>Rs. {(item.price * item.quantity).toFixed(2)}</b></div>
             </div>
-            <button onClick={() => removeItem(item.id, item.selectedSize)} style={{ color: 'red', marginLeft: 16 }}>Remove</button>
+            <button className="remove-btn" onClick={() => removeItem(item.id, item.selectedSize)}>
+              <FaTrash /> Remove
+            </button>
           </div>
         ))}
       </div>
       <div className="cart-total-row">
-        <h3>Total: Rs. {getCartTotal().toFixed(2)}</h3>
-        <button onClick={() => navigate('/checkout')}>Proceed to Checkout</button>
+        <div className="cart-total-amount">
+          Total: Rs. {getCartTotal().toLocaleString()}
+        </div>
+        <button className="checkout-btn" onClick={() => navigate('/checkout')}>
+          Proceed to Checkout <FaArrowRight />
+        </button>
       </div>
     </div>
   );
