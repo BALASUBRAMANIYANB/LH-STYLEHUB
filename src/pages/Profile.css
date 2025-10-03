@@ -410,7 +410,9 @@
   }
 
   .profile-section {
-    padding: 1.5rem;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .section-header {
