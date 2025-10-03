@@ -6,6 +6,26 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import './LoginModal.css';
 
+// Country codes data
+const countryCodes = [
+  { code: '+91', country: 'India', flag: '🇮🇳' },
+  { code: '+1', country: 'United States', flag: '🇺🇸' },
+  { code: '+44', country: 'United Kingdom', flag: '🇬🇧' },
+  { code: '+61', country: 'Australia', flag: '🇦🇺' },
+  { code: '+81', country: 'Japan', flag: '🇯🇵' },
+  { code: '+86', country: 'China', flag: '🇨🇳' },
+  { code: '+49', country: 'Germany', flag: '🇩🇪' },
+  { code: '+33', country: 'France', flag: '🇫🇷' },
+  { code: '+39', country: 'Italy', flag: '🇮🇹' },
+  { code: '+7', country: 'Russia', flag: '🇷🇺' },
+  { code: '+55', country: 'Brazil', flag: '🇧🇷' },
+  { code: '+27', country: 'South Africa', flag: '🇿🇦' },
+  { code: '+82', country: 'South Korea', flag: '🇰🇷' },
+  { code: '+65', country: 'Singapore', flag: '🇸🇬' },
+  { code: '+971', country: 'UAE', flag: '🇦🇪' },
+  { code: '+966', country: 'Saudi Arabia', flag: '🇸🇦' }
+];
+
 const LoginModal = ({ isOpen, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -13,7 +33,8 @@ const LoginModal = ({ isOpen, onClose }) => {
     password: '',
     firstName: '',
     lastName: '',
-    phone: ''
+    phone: '',
+    countryCode: '+91'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -43,14 +64,14 @@ const LoginModal = ({ isOpen, onClose }) => {
         setSuccess('Login successful!');
         setTimeout(() => {
           onClose();
-          setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '' });
+          setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '', countryCode: '+91' });
         }, 1000);
       } else {
-        await signup(formData.email, formData.password, formData.firstName, formData.lastName, formData.phone);
+        await signup(formData.email, formData.password, formData.firstName, formData.lastName, formData.countryCode + formData.phone);
         setSuccess('Account created successfully!');
         setTimeout(() => {
           onClose();
-          setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '' });
+          setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '', countryCode: '+91' });
         }, 1000);
       }
     } catch (error) {
@@ -101,7 +122,7 @@ const LoginModal = ({ isOpen, onClose }) => {
       setSuccess(`Welcome, ${user.displayName}`);
       setTimeout(() => {
         onClose();
-        setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '' });
+        setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '', countryCode: '+91' });
       }, 1000);
     } catch (error) {
       console.error('Google sign-in error:', error);
@@ -115,7 +136,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     setIsLogin(!isLogin);
     setError('');
     setSuccess('');
-    setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '' });
+    setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '', countryCode: '+91' });
   };
 
   if (!isOpen) return null;
@@ -184,15 +205,31 @@ const LoginModal = ({ isOpen, onClose }) => {
                 <label htmlFor="phone">
                   <FaPhone /> Phone Number
                 </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required={!isLogin}
-                  placeholder="Enter your phone number"
-                />
+                <div className="phone-input-container">
+                  <select
+                    name="countryCode"
+                    value={formData.countryCode}
+                    onChange={handleInputChange}
+                    className="country-code-select"
+                    required={!isLogin}
+                  >
+                    {countryCodes.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.flag} {country.code} ({country.country})
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required={!isLogin}
+                    placeholder="Enter your phone number"
+                    className="phone-number-input"
+                  />
+                </div>
               </div>
             </>
           )}
