@@ -1,36 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FaShoppingCart } from 'react-icons/fa';
+import productData from '../data/products';
 import './TShirts.css';
-
-const tshirts = [
-  {
-    id: 1,
-    name: 'OVERSIZED DAMN TEE',
-    subtitle: 'KENDRICK LAMAR',
-    price: 749,
-    originalPrice: 999,
-    image: '/images/products/K-1.jpg',
-    category: 'THE CULTURE GLITCH'
-  },
-  {
-    id: 2,
-    name: 'OVERSIZED I CAN FLY TEE',
-    subtitle: 'TRAVIS SCOTT',
-    price: 749,
-    originalPrice: 999,
-    image: '/images/products/T-1.jpg',
-    category: 'TRAVIS SCOTT COLLECTION'
-  },
-  {
-    id: 3,
-    name: 'OVERSIZED XO HORIZON TEE',
-    subtitle: 'THE WEEKND',
-    price: 749,
-    originalPrice: 999,
-    image: '/images/products/W-1.jpg',
-    category: 'THE WEEKND'
-  },
-];
 
 const TShirts = () => {
   const calculateDiscount = (original, current) => {
@@ -40,31 +12,63 @@ const TShirts = () => {
   return (
     <div className="tshirts-page">
       <div className="container">
-        <div className="page-header">
-          <h1>T-Shirts</h1>
+        {/* Hero Section */}
+        <div className="hero-section">
+          <h1>Premium T-Shirts Collection</h1>
+          <p>Discover our exclusive range of high-quality, comfortable t-shirts for every occasion</p>
         </div>
+
+        {/* Product Grid */}
         <div className="tshirts-grid">
-          {tshirts.map((product) => (
+          {productData.map((product) => (
             <div key={product.id} className="tshirt-card">
+              <div className="tshirt-badge">
+                {product.isNew && <span className="new-badge">New</span>}
+                {product.originalPrice > product.price && (
+                  <span className="discount-badge">
+                    {calculateDiscount(product.originalPrice, product.price)}% OFF
+                  </span>
+                )}
+              </div>
+
               <div className="tshirt-image-container">
-                <img 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="tshirt-img"
-                />
-                <div className="tshirt-overlay">
-                  <Link to={`/product/${product.id}`} className="view-btn">
-                    View Product
-                  </Link>
+                <Link to={`/product/${product.id}`}>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="tshirt-img"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/images/placeholder.jpg';
+                    }}
+                  />
+                </Link>
+                <div className="tshirt-actions">
+                  <button className="quick-view">Quick View</button>
+                  <button className="add-to-cart">
+                    <FaShoppingCart /> Add to Cart
+                  </button>
                 </div>
               </div>
+
               <div className="tshirt-details">
-                <h3 className="tshirt-name">{product.name}</h3>
-                <p className="tshirt-subtitle">{product.subtitle}</p>
+                <h3 className="tshirt-name">
+                  <Link to={`/product/${product.id}`}>
+                    {product.name}
+                  </Link>
+                </h3>
+
+                <p className="tshirt-description">
+                  {product.description.substring(0, 60)}...
+                </p>
+
                 <div className="tshirt-price">
-                  <span className="current-price">Rs. {product.price}</span>
-                  <span className="original-price">Rs. {product.originalPrice}</span>
-                  <span className="discount">{calculateDiscount(product.originalPrice, product.price)}% OFF</span>
+                  <span className="current-price">₹{product.price.toLocaleString()}</span>
+                  {product.originalPrice > product.price && (
+                    <span className="original-price">
+                      ₹{product.originalPrice.toLocaleString()}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

@@ -66,7 +66,7 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />
-            <Route path="/tshirts" element={<TShirts />} />
+            <Route path="/t-shirts" element={<TShirts />} />
             <Route path="/product/:id" element={<ProductDetails addToCart={addToCart} />} />
             <Route path="/polo" element={<div className="page-placeholder">Polo Shirts Coming Soon</div>} />
             <Route path="/faq" element={<FAQ />} />

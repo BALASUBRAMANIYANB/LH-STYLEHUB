@@ -15,7 +15,7 @@ const Header = ({ cartCount, onLoginClick, onCartClick }) => {
         {/* Left Side - Navigation */}
         <nav className="nav-left">
           <Link to="/" className="nav-link">Home</Link>
-          <Link to="/products" className="nav-link">T-Shirts</Link>
+          <Link to="/t-shirts" className="nav-link">T-Shirts</Link>
           <Link to="/polo" className="nav-link">Polo</Link>
           <Link to="/support" className="nav-link">Contact</Link>
         </nav>
@@ -69,7 +69,7 @@ const Header = ({ cartCount, onLoginClick, onCartClick }) => {
             <div className="mobile-menu">
               <nav className="mobile-nav">
                 <Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
-                <Link to="/products" onClick={() => setIsMenuOpen(false)}>T-Shirts</Link>
+                <Link to="/t-shirts" onClick={() => setIsMenuOpen(false)}>T-Shirts</Link>
                 <Link to="/polo" onClick={() => setIsMenuOpen(false)}>Polo</Link>
                 <Link to="/support" onClick={() => setIsMenuOpen(false)}>Contact</Link>
               </nav>

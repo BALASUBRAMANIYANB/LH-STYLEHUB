@@ -1,110 +1,170 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FaWhatsapp } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { FaShoppingCart, FaWhatsapp, FaArrowLeft, FaCheck } from 'react-icons/fa';
+import productData from '../data/products';
 import './Products.css';
 
 const Products = () => {
-  const products = [
-    {
-      id: 1,
-      name: 'OVERSIZED DAMN TEE',
-      subtitle: 'KENDRICK LAMAR',
-      price: 749,
-      originalPrice: 999,
-      image: '/images/products/K-1.jpg',
-      category: 'THE CULTURE GLITCH'
-    },
-    {
-      id: 2,
-      name: 'OVERSIZED I CAN FLY TEE',
-      subtitle: 'TRAVIS SCOTT',
-      price: 749,
-      originalPrice: 999,
-      image: '/images/products/T-1.jpg',
-      category: 'TRAVIS SCOTT COLLECTION'
-    },
-    {
-      id: 3,
-      name: 'OVERSIZED XO HORIZON TEE',
-      subtitle: 'THE WEEKND',
-      price: 749,
-      originalPrice: 999,
-      image: '/images/products/W-1.jpg',
-      category: 'THE WEEKND'
-    },
-  ];
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [selectedSize, setSelectedSize] = useState('');
+  const [quantity, setQuantity] = useState(1);
+  const [addedToCart, setAddedToCart] = useState(false);
+  
+  // Find the product by ID
+  const product = productData.find(p => p.id === parseInt(id));
+
+  // If product not found, redirect to T-Shirts page
+  React.useEffect(() => {
+    if (!product) {
+      navigate('/t-shirts');
+    }
+  }, [product, navigate]);
+
+  if (!product) {
+    return null; // or a loading message
+  }
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      alert('Please select a size');
+      return;
+    }
+    // Add to cart logic here
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
+  
+  const handleBuyNow = () => {
+    if (!selectedSize) {
+      alert('Please select a size');
+      return;
+    }
+    // Proceed to checkout with selected size and quantity
+    navigate('/checkout', {
+      state: {
+        product: {
+          ...product,
+          selectedSize,
+          quantity
+        }
+      }
+    });
+  };
 
   return (
-    <div className="products-page">
+    <div className="product-detail-page">
       <div className="container">
-        {/* Page Header */}
-        <div className="page-header">
-          <h1>T-Shirts</h1>
-        </div>
-
-        {/* Products Grid */}
-        <div className="products-grid">
-          {products.map((product) => (
-            <div key={product.id} className="product-card">
-              <div className="product-image">
-                <img src={product.image} alt={product.name} />
-                <div className="product-overlay">
-                  <Link to={`/product/${product.id}`} className="view-btn">
-                    View Product
-                  </Link>
+        <button className="back-button" onClick={() => navigate('/t-shirts')}>
+          <FaArrowLeft /> Back to T-Shirts
+        </button>
+        
+        <div className="product-detail-container">
+          <div className="product-gallery">
+            <div className="main-image">
+              <img 
+                src={product.image} 
+                alt={product.name} 
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/images/placeholder.jpg';
+                }}
+              />
+            </div>
+          </div>
+          
+          <div className="product-info">
+            <h1 className="product-title">{product.name}</h1>
+            <p className="product-subtitle">{product.subtitle}</p>
+            
+            <div className="price-container">
+              <span className="current-price">Rs. {product.price}</span>
+              <span className="original-price">Rs. {product.originalPrice}</span>
+              <span className="discount">
+                {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+              </span>
+            </div>
+            
+            <div className="product-description">
+              <p>{product.description}</p>
+            </div>
+            
+            <div className="product-options">
+              <div className="option-group">
+                <label>Select Size</label>
+                <div className="size-options">
+                  {product.sizes.map((size) => (
+                    <button
+                      key={size}
+                      className={`size-option ${selectedSize === size ? 'selected' : ''}`}
+                      onClick={() => setSelectedSize(size)}
+                    >
+                      {size}
+                    </button>
+                  ))}
                 </div>
               </div>
-              <div className="product-info">
-                <h3 className="product-name">{product.name}</h3>
-                <p className="product-subtitle">{product.subtitle}</p>
-                <div className="product-price">
-                  <span className="current-price">Rs. {product.price}</span>
-                  <span className="original-price">Rs. {product.originalPrice}</span>
-                  <span className="discount">{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF</span>
-                </div>
-                <div className="product-actions">
-                  <button className="add-to-cart">
-                    Add to Cart
+              
+              <div className="option-group">
+                <label>Quantity</label>
+                <div className="quantity-selector">
+                  <button 
+                    onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                    disabled={quantity <= 1}
+                  >
+                    -
                   </button>
-                  <button className="buy-now">
-                    Buy Now
-                  </button>
+                  <span>{quantity}</span>
+                  <button onClick={() => setQuantity(prev => prev + 1)}>+</button>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Collection Info */}
-        <div className="collection-info">
-          <div className="info-card">
-            <h3>Premium Quality</h3>
-            <p>220 GSM premium combed cotton for ultimate comfort and durability</p>
-          </div>
-          <div className="info-card">
-            <h3>Oversized Fit</h3>
-            <p>Relaxed oversized fit perfect for streetwear styling</p>
-          </div>
-          <div className="info-card">
-            <h3>DTF Printing</h3>
-            <p>High-quality DTF prints that stay vibrant even after multiple washes</p>
-          </div>
-        </div>
-
-        {/* Call to Action */}
-        <div className="cta-section">
-          <h2>Ready to Rock the Streetwear Look?</h2>
-          <p>Join the LH STYLEHUB movement and express your unique style</p>
-          <div className="cta-buttons">
-            <Link to="/" className="cta-btn primary">Back to Home</Link>
-            <Link to="/story" className="cta-btn secondary">Our Story</Link>
+            
+            <div className="product-actions">
+              <button 
+                className={`add-to-cart ${addedToCart ? 'added' : ''}`} 
+                onClick={handleAddToCart}
+                disabled={addedToCart}
+              >
+                {addedToCart ? (
+                  <>
+                    <FaCheck /> Added to Cart
+                  </>
+                ) : (
+                  <>
+                    <FaShoppingCart /> Add to Cart
+                  </>
+                )}
+              </button>
+              <button 
+                className="buy-now" 
+                onClick={handleBuyNow}
+                disabled={!selectedSize}
+              >
+                Buy Now
+              </button>
+            </div>
+            
+            <div className="product-details">
+              <h3>Product Details</h3>
+              <ul>
+                {product.details.map((detail, index) => (
+                  <li key={index}>{detail}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Floating WhatsApp Support Button */}
-      <a href="https://wa.me/9791999113" className="whatsapp-support" target="_blank" rel="noopener noreferrer">
-        <FaWhatsapp />
+      
+      {/* WhatsApp Support */}
+      <a 
+        href="https://wa.me/1234567890" 
+        className="whatsapp-float" 
+        target="_blank" 
+        rel="noopener noreferrer"
+      >
+        <FaWhatsapp className="whatsapp-icon" />
       </a>
     </div>
   );
