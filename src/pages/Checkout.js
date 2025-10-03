@@ -113,6 +113,7 @@ const Checkout = ({ onOrderComplete }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cod'); // 'online' or 'cod'
+  const [formErrors, setFormErrors] = useState({});
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -120,6 +121,32 @@ const Checkout = ({ onOrderComplete }) => {
       ...prev,
       [name]: value
     }));
+
+    // Clear error for this field
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+
+    if (!shippingInfo.firstName.trim()) errors.firstName = 'First name is required';
+    if (!shippingInfo.lastName.trim()) errors.lastName = 'Last name is required';
+    if (!shippingInfo.email.trim()) errors.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(shippingInfo.email)) errors.email = 'Email is invalid';
+    if (!shippingInfo.phone.trim()) errors.phone = 'Phone number is required';
+    else if (!/^\d{10}$/.test(shippingInfo.phone.replace(/\D/g, ''))) errors.phone = 'Phone number must be 10 digits';
+    if (!shippingInfo.address.trim()) errors.address = 'Address is required';
+    if (!shippingInfo.city.trim()) errors.city = 'City is required';
+    if (!shippingInfo.state.trim()) errors.state = 'State is required';
+    if (!shippingInfo.zipCode.trim()) errors.zipCode = 'ZIP code is required';
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const getCartTotal = () => {
@@ -273,6 +300,11 @@ const Checkout = ({ onOrderComplete }) => {
       return;
     }
 
+    if (!validateForm()) {
+      setError('Please correct the errors below');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -328,9 +360,27 @@ const Checkout = ({ onOrderComplete }) => {
   return (
     <div className="checkout-container">
       <div className="checkout-content">
+        {/* Progress Indicator */}
+        <div className="checkout-progress">
+          <div className="progress-step active">
+            <div className="step-number">1</div>
+            <div className="step-label">Cart</div>
+          </div>
+          <div className="progress-line active"></div>
+          <div className="progress-step active">
+            <div className="step-number">2</div>
+            <div className="step-label">Shipping</div>
+          </div>
+          <div className="progress-line active"></div>
+          <div className="progress-step active">
+            <div className="step-number">3</div>
+            <div className="step-label">Payment</div>
+          </div>
+        </div>
+
         <div className="checkout-header">
-          <h1>Checkout</h1>
-          <p>Complete your order</p>
+          <h1>Secure Checkout</h1>
+          <p>Complete your order with confidence</p>
         </div>
 
         {error && (
@@ -383,7 +433,9 @@ const Checkout = ({ onOrderComplete }) => {
                     value={shippingInfo.firstName}
                     onChange={handleInputChange}
                     required
+                    className={formErrors.firstName ? 'error' : ''}
                   />
+                  {formErrors.firstName && <span className="field-error">{formErrors.firstName}</span>}
                 </div>
                 <div className="form-group">
                   <label htmlFor="lastName">
@@ -396,7 +448,9 @@ const Checkout = ({ onOrderComplete }) => {
                     value={shippingInfo.lastName}
                     onChange={handleInputChange}
                     required
+                    className={formErrors.lastName ? 'error' : ''}
                   />
+                  {formErrors.lastName && <span className="field-error">{formErrors.lastName}</span>}
                 </div>
               </div>
 
@@ -412,7 +466,9 @@ const Checkout = ({ onOrderComplete }) => {
                     value={shippingInfo.email}
                     onChange={handleInputChange}
                     required
+                    className={formErrors.email ? 'error' : ''}
                   />
+                  {formErrors.email && <span className="field-error">{formErrors.email}</span>}
                 </div>
                 <div className="form-group">
                   <label htmlFor="phone">
@@ -425,7 +481,9 @@ const Checkout = ({ onOrderComplete }) => {
                     value={shippingInfo.phone}
                     onChange={handleInputChange}
                     required
+                    className={formErrors.phone ? 'error' : ''}
                   />
+                  {formErrors.phone && <span className="field-error">{formErrors.phone}</span>}
                 </div>
               </div>
 
@@ -440,7 +498,9 @@ const Checkout = ({ onOrderComplete }) => {
                   value={shippingInfo.address}
                   onChange={handleInputChange}
                   required
+                  className={formErrors.address ? 'error' : ''}
                 />
+                {formErrors.address && <span className="field-error">{formErrors.address}</span>}
               </div>
 
               <div className="form-row">
@@ -455,7 +515,9 @@ const Checkout = ({ onOrderComplete }) => {
                     value={shippingInfo.city}
                     onChange={handleInputChange}
                     required
+                    className={formErrors.city ? 'error' : ''}
                   />
+                  {formErrors.city && <span className="field-error">{formErrors.city}</span>}
                 </div>
                 <div className="form-group">
                   <label htmlFor="state">
@@ -468,7 +530,9 @@ const Checkout = ({ onOrderComplete }) => {
                     value={shippingInfo.state}
                     onChange={handleInputChange}
                     required
+                    className={formErrors.state ? 'error' : ''}
                   />
+                  {formErrors.state && <span className="field-error">{formErrors.state}</span>}
                 </div>
               </div>
 
@@ -484,7 +548,9 @@ const Checkout = ({ onOrderComplete }) => {
                     value={shippingInfo.zipCode}
                     onChange={handleInputChange}
                     required
+                    className={formErrors.zipCode ? 'error' : ''}
                   />
+                  {formErrors.zipCode && <span className="field-error">{formErrors.zipCode}</span>}
                 </div>
                 <div className="form-group">
                   <label htmlFor="country">
