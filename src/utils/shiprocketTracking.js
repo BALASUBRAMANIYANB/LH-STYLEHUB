@@ -45,58 +45,93 @@ async function trackShipment(awb) {
 async function createShipment(order) {
   const token = await authenticateShiprocket();
 
-  // Prepare order data for Shiprocket
+  // Prepare order data for Shiprocket - simplified format
   const shipmentData = {
     order_id: order.orderId,
-    order_date: new Date(order.orderDate).toISOString().split('T')[0], // YYYY-MM-DD
-    pickup_location: process.env.SHIPROCKET_PICKUP_LOCATION || 'Primary', // Set in env
-    channel_id: process.env.SHIPROCKET_CHANNEL_ID || '', // Required: sales channel ID
-    comment: 'Auto-created shipment',
+    order_date: new Date().toISOString().split('T')[0], // Today's date
+    pickup_location: process.env.SHIPROCKET_PICKUP_LOCATION || 'Primary',
+    channel_id: process.env.SHIPROCKET_CHANNEL_ID || '',
+    comment: 'Auto-created shipment from LH StyleHub',
+
+    // Billing Address
     billing_customer_name: `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`,
     billing_last_name: order.shippingAddress.lastName,
     billing_address: order.shippingAddress.address,
-    billing_address_2: '',
     billing_city: order.shippingAddress.city,
-    billing_pincode: order.shippingAddress.zipCode,
+    billing_pincode: parseInt(order.shippingAddress.zipCode),
     billing_state: order.shippingAddress.state,
     billing_country: order.shippingAddress.country,
     billing_email: order.shippingAddress.email,
     billing_phone: order.shippingAddress.phone,
+
+    // Shipping Address (same as billing)
     shipping_is_billing: true,
     shipping_customer_name: `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`,
-    shipping_last_name: order.shippingAddress.lastName,
     shipping_address: order.shippingAddress.address,
-    shipping_address_2: '',
     shipping_city: order.shippingAddress.city,
-    shipping_pincode: order.shippingAddress.zipCode,
+    shipping_pincode: parseInt(order.shippingAddress.zipCode),
     shipping_country: order.shippingAddress.country,
     shipping_state: order.shippingAddress.state,
     shipping_email: order.shippingAddress.email,
     shipping_phone: order.shippingAddress.phone,
-    order_items: order.items.map(item => ({
+
+    // Order Items
+    order_items: order.items.map((item, index) => ({
       name: item.name,
-      sku: item.id,
-      units: item.quantity,
-      selling_price: item.price,
+      sku: item.id || `SKU${index + 1}`,
+      units: parseInt(item.quantity),
+      selling_price: parseFloat(item.price),
       discount: 0,
       tax: 0,
-      hsn: 0
+      hsn: 61091000 // Default HSN for clothing
     })),
-    payment_method: 'COD', // Since it's COD
-    shipping_charges: 0,
-    giftwrap_charges: 0,
-    transaction_charges: 0,
-    total_discount: 0,
-    sub_total: order.total,
-    length: 10, // Default dimensions
-    breadth: 10,
-    height: 10,
-    weight: 0.5
+
+    // Payment and charges
+    payment_method: 'COD',
+    sub_total: parseFloat(order.total),
+    length: 20, // Package dimensions in cm
+    breadth: 15,
+    height: 5,
+    weight: 0.5 // Weight in kg
   };
 
-  const response = await axios.post(
-    `${SHIPROCKET_BASE_URL}/orders/create`,
-    shipmentData,
+  console.log('=== SHIPMENT CREATION DEBUG ===');
+  console.log('Environment variables:', {
+    email: process.env.SHIPROCKET_EMAIL,
+    pickup: process.env.SHIPROCKET_PICKUP_LOCATION,
+    channel: process.env.SHIPROCKET_CHANNEL_ID
+  });
+  console.log('Sending shipment data to Shiprocket:', JSON.stringify(shipmentData, null, 2));
+
+  try {
+    // For manual channels, use the adhoc order creation endpoint
+    const response = await axios.post(
+      `${SHIPROCKET_BASE_URL}/orders/create/adhoc`,
+      shipmentData,
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Shiprocket API Error:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      url: `${SHIPROCKET_BASE_URL}/orders/create`
+    });
+    throw error;
+  }
+}
+
+/**
+ * Get available channels from Shiprocket
+ * @returns {Promise<Array>} - List of available channels
+ */
+async function getChannels() {
+  const token = await authenticateShiprocket();
+  const response = await axios.get(
+    `${SHIPROCKET_BASE_URL}/channels`,
     {
       headers: { Authorization: `Bearer ${token}` }
     }
@@ -104,4 +139,19 @@ async function createShipment(order) {
   return response.data;
 }
 
-module.exports = { trackShipment, createShipment };
+/**
+ * Get available pickup locations from Shiprocket
+ * @returns {Promise<Array>} - List of available pickup locations
+ */
+async function getPickupLocations() {
+  const token = await authenticateShiprocket();
+  const response = await axios.get(
+    `${SHIPROCKET_BASE_URL}/settings/company/pickup`,
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+  return response.data;
+}
+
+module.exports = { trackShipment, createShipment, getChannels, getPickupLocations };

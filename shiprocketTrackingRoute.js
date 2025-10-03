@@ -59,7 +59,16 @@ router.post('/create-shipment', async (req, res) => {
     res.json(shipmentData);
   } catch (err) {
     console.error('Shipment creation error:', err);
-    res.status(500).json({ error: 'Shipment creation failed', details: err.message });
+    console.error('Error details:', {
+      message: err.message,
+      response: err.response?.data,
+      status: err.response?.status
+    });
+    res.status(500).json({
+      error: 'Shipment creation failed',
+      details: err.message,
+      shiprocketError: err.response?.data
+    });
   }
 });
 
