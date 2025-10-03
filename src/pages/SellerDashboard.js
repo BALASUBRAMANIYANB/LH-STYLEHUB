@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { ref, get, getDatabase, update, push } from "firebase/database";
+import { ref, get, getDatabase, update, push, remove } from "firebase/database";
 import { getApp } from "firebase/app";
 import { useAuth } from '../contexts/AuthContext';
 
@@ -150,14 +150,28 @@ const SellerDashboard = () => {
     if (!confirm('This will permanently delete the order. Are you absolutely sure?')) {
       return;
     }
+
+    console.log('Attempting to delete order:', {
+      orderId: order.orderId,
+      orderKey: order.orderKey,
+      uid: order.uid
+    });
+
     try {
       const db = getDatabase(getApp());
-      await update(ref(db, `users/${order.uid}/orders/${order.orderKey}`), null); // Delete the order
+      const orderRef = ref(db, `users/${order.uid}/orders/${order.orderKey}`);
+
+      // Use remove() instead of set(null) for proper deletion
+      await remove(orderRef);
+
+      // Update local state
       setOrders(prev => prev.filter(o => o.orderKey !== order.orderKey));
+
+      console.log('Order deleted successfully:', order.orderId);
       alert('Order deleted permanently');
     } catch (e) {
-      alert('Failed to delete order');
-      console.error(e);
+      console.error('Failed to delete order:', e);
+      alert(`Failed to delete order: ${e.message}`);
     }
   };
 
