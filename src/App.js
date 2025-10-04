@@ -30,6 +30,7 @@ function AppContent() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPromo, setCurrentPromo] = useState(0);
+  const [loginMessage, setLoginMessage] = useState('');
   const { cart, addToCart, removeItem, updateQuantity, clearCart, notification, clearNotification } = useCart();
 
   // Auto-slide promotional offers every 3 seconds
@@ -38,6 +39,17 @@ function AppContent() {
       setCurrentPromo((prev) => (prev + 1) % 2);
     }, 3000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Listen for login modal open events from cart context
+  useEffect(() => {
+    const handleOpenLoginModal = () => {
+      setLoginMessage('Please login to add items to your cart and place orders.');
+      setIsLoginModalOpen(true);
+    };
+
+    window.addEventListener('openLoginModal', handleOpenLoginModal);
+    return () => window.removeEventListener('openLoginModal', handleOpenLoginModal);
   }, []);
 
   const getCartCount = () => cart.reduce((total, item) => total + item.quantity, 0);
@@ -90,7 +102,11 @@ function AppContent() {
         
         <LoginModal
           isOpen={isLoginModalOpen}
-          onClose={() => setIsLoginModalOpen(false)}
+          onClose={() => {
+            setIsLoginModalOpen(false);
+            setLoginMessage('');
+          }}
+          message={loginMessage}
         />
 
         <CartSidebar
@@ -120,7 +136,11 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <CartProvider>
+      <CartProvider onLoginRequired={() => {
+        // This will be passed down to trigger login modal from cart context
+        const event = new CustomEvent('openLoginModal');
+        window.dispatchEvent(event);
+      }}>
         <AppContent />
       </CartProvider>
     </AuthProvider>

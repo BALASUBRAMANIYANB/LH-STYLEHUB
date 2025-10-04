@@ -18,7 +18,7 @@ export function useCart() {
   return useContext(CartContext);
 }
 
-export function CartProvider({ children }) {
+export function CartProvider({ children, onLoginRequired }) {
   const { currentUser } = useAuth();
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,15 +61,12 @@ export function CartProvider({ children }) {
   const addToCart = (product, selectedSize) => {
     console.log('[CartProvider] addToCart called. currentUser:', currentUser);
 
-    // Show notification if user is not logged in
+    // Require login for guest users
     if (!currentUser) {
-      setNotification({
-        type: 'warning',
-        message: 'Please log in to save your cart items permanently. Items will be lost if you refresh the page.',
-        duration: 5000
-      });
-      // Clear notification after duration
-      setTimeout(() => setNotification(null), 5000);
+      if (onLoginRequired) {
+        onLoginRequired();
+      }
+      return; // Don't add to cart for guest users
     }
 
     setCart(prev => {

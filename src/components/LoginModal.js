@@ -26,7 +26,7 @@ const countryCodes = [
   { code: '+966', country: 'Saudi Arabia', flag: '🇸🇦' }
 ];
 
-const LoginModal = ({ isOpen, onClose }) => {
+const LoginModal = ({ isOpen, onClose, message }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -151,6 +151,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         <div className="modal-header">
           <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
           <p>{isLogin ? 'Sign in to your account' : 'Join us and start shopping'}</p>
+          {message && <div className="login-message">{message}</div>}
         </div>
 
         {error && <div className="error-message">{error}</div>}
