@@ -22,6 +22,7 @@ import Checkout from './pages/Checkout';
 import TermsConditions from './pages/TermsConditions';
 import CartSidebar from './components/CartSidebar';
 import OrderConfirmation from './pages/OrderConfirmation';
+import Notification from './components/Notification';
 import './App.css';
 
 
@@ -29,7 +30,7 @@ function AppContent() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPromo, setCurrentPromo] = useState(0);
-  const { cart, addToCart, removeItem, updateQuantity, clearCart } = useCart();
+  const { cart, addToCart, removeItem, updateQuantity, clearCart, notification, clearNotification } = useCart();
 
   // Auto-slide promotional offers every 3 seconds
   useEffect(() => {
@@ -103,6 +104,11 @@ function AppContent() {
             setIsCartOpen(false);
             window.location.href = '/checkout';
           }}
+        />
+
+        <Notification
+          notification={notification}
+          onClose={clearNotification}
         />
       </div>
     </Router>

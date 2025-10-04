@@ -22,6 +22,7 @@ export function CartProvider({ children }) {
   const { currentUser } = useAuth();
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState(null);
 
   // Load cart from Firebase when user logs in
   useEffect(() => {
@@ -59,6 +60,18 @@ export function CartProvider({ children }) {
   // Cart actions
   const addToCart = (product, selectedSize) => {
     console.log('[CartProvider] addToCart called. currentUser:', currentUser);
+
+    // Show notification if user is not logged in
+    if (!currentUser) {
+      setNotification({
+        type: 'warning',
+        message: 'Please log in to save your cart items permanently. Items will be lost if you refresh the page.',
+        duration: 5000
+      });
+      // Clear notification after duration
+      setTimeout(() => setNotification(null), 5000);
+    }
+
     setCart(prev => {
       let newCart;
       const existing = prev.find(
@@ -126,10 +139,12 @@ export function CartProvider({ children }) {
   const value = {
     cart,
     loading,
+    notification,
     addToCart,
     updateQuantity,
     removeItem,
-    clearCart
+    clearCart,
+    clearNotification: () => setNotification(null)
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
