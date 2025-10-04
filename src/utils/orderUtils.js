@@ -10,8 +10,8 @@ const sanitize = (obj) => {
   }
 };
 
-export const createOrder = (cartItems, userInfo, shippingAddress) => {
-  const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+export const createOrder = (cartItems, userInfo, shippingAddress, shippingCost = 0, tax = 0) => {
+  const orderId = `LH-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
   const safeUser = {
     firstName: safe(userInfo?.firstName, ''),
@@ -32,6 +32,9 @@ export const createOrder = (cartItems, userInfo, shippingAddress) => {
     country: safe(shippingAddress?.country, 'India')
   };
   
+  const subtotal = (cartItems || []).reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0);
+  const total = subtotal + shippingCost + tax;
+
   const order = {
     orderId,
     items: (cartItems || []).map(item => ({
@@ -42,7 +45,10 @@ export const createOrder = (cartItems, userInfo, shippingAddress) => {
       quantity: Number(item.quantity) || 1,
       image: safe(item.image, '')
     })),
-    total: (cartItems || []).reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0),
+    subtotal,
+    shippingCost,
+    tax,
+    total,
     status: 'pending',
     userInfo: safeUser,
     shippingAddress: safeAddress,

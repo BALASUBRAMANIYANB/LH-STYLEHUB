@@ -170,7 +170,9 @@ const Checkout = ({ onOrderComplete }) => {
   const processOrderAfterPayment = async () => {
     try {
       // Create order object
-      const order = createOrder(cart, userProfile, shippingInfo);
+      const shippingCost = getShippingCost();
+      const taxAmount = getTax();
+      const order = createOrder(cart, userProfile, shippingInfo, shippingCost, taxAmount);
       order.paymentMethod = paymentMethod; // Add payment method to order
 
       // Persist order and verify success
