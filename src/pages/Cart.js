@@ -1,14 +1,32 @@
 import React from 'react';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { FaShoppingCart, FaTrash, FaArrowRight, FaMinus, FaPlus } from 'react-icons/fa';
+import { FaShoppingCart, FaTrash, FaArrowRight, FaMinus, FaPlus, FaUser } from 'react-icons/fa';
 import './Cart.css';
 
 const Cart = () => {
   const { cart, updateQuantity, removeItem } = useCart();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   const getCartTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+  // Show login prompt for guest users
+  if (!currentUser) {
+    return (
+      <div className="cart-page-container">
+        <div className="cart-empty">
+          <FaUser />
+          <h2>Login to Continue</h2>
+          <p>Please log in to add products to your cart and place orders</p>
+          <button className="continue-shopping-btn" onClick={() => navigate('/')}>
+            <FaArrowRight /> Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (cart.length === 0) {
     return (
