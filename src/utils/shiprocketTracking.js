@@ -151,7 +151,8 @@ async function getPickupLocations() {
       headers: { Authorization: `Bearer ${token}` }
     }
   );
-  return response.data;
+  // Return the shipping_address array
+  return response.data.data?.shipping_address || [];
 }
 
 module.exports = { trackShipment, createShipment, getChannels, getPickupLocations };

@@ -1,4 +1,5 @@
 // Minimal Express server to serve Shiprocket tracking API
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');

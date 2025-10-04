@@ -1,79 +1,55 @@
 require('dotenv').config();
-const { createShipment, getChannels, getPickupLocations } = require('./src/utils/shiprocketTracking');
+const axios = require('axios');
 
-async function testChannels() {
+const SHIPROCKET_EMAIL = process.env.SHIPROCKET_EMAIL;
+const SHIPROCKET_PASSWORD = process.env.SHIPROCKET_PASSWORD;
+const SHIPROCKET_BASE_URL = 'https://apiv2.shiprocket.in/v1/external';
+
+async function testShiprocketConnection() {
+  console.log('Testing Shiprocket API connection...');
+  console.log('Email:', SHIPROCKET_EMAIL);
+  console.log('Password:', SHIPROCKET_PASSWORD ? 'SET' : 'NOT SET');
+
   try {
-    console.log('Getting available channels...');
-    const channels = await getChannels();
-    console.log('Available channels:', JSON.stringify(channels, null, 2));
+    // Test authentication
+    console.log('\n1. Testing authentication...');
+    const authResponse = await axios.post(`${SHIPROCKET_BASE_URL}/auth/login`, {
+      email: SHIPROCKET_EMAIL,
+      password: SHIPROCKET_PASSWORD
+    });
+
+    console.log('✅ Authentication successful!');
+    console.log('Token received:', authResponse.data.token ? 'YES' : 'NO');
+
+    const token = authResponse.data.token;
+
+    // Test getting channels
+    console.log('\n2. Testing channels API...');
+    const channelsResponse = await axios.get(`${SHIPROCKET_BASE_URL}/channels`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    console.log('✅ Channels API working!');
+    console.log('Available channels:', channelsResponse.data.data?.length || 0);
+
+    // Test pickup locations
+    console.log('\n3. Testing pickup locations...');
+    const pickupResponse = await axios.get(`${SHIPROCKET_BASE_URL}/settings/company/pickup`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    console.log('✅ Pickup locations API working!');
+    console.log('Pickup locations:', pickupResponse.data.data?.length || 0);
+
+    console.log('\n🎉 All Shiprocket API tests passed!');
+
   } catch (error) {
-    console.error('Error getting channels:', error.message);
-    if (error.response) {
-      console.error('Response status:', error.response.status);
-      console.error('Response data:', error.response.data);
-    }
+    console.error('\n❌ Shiprocket API test failed:');
+    console.error('Status:', error.response?.status);
+    console.error('Status Text:', error.response?.statusText);
+    console.error('Error Data:', error.response?.data);
+    console.error('Error Message:', error.message);
   }
 }
 
-async function testShipment() {
-  const testOrder = {
-    orderId: "TEST-123",
-    items: [{
-      name: "Test Product",
-      quantity: 1,
-      price: 100,
-      id: "TEST001"
-    }],
-    total: 100,
-    shippingAddress: {
-      firstName: "Test",
-      lastName: "User",
-      address: "Test Address",
-      city: "Test City",
-      state: "Test State",
-      zipCode: "123456",
-      country: "India",
-      email: "test@example.com",
-      phone: "1234567890"
-    }
-  };
-
-  try {
-    console.log('Testing shipment creation...');
-    const result = await createShipment(testOrder);
-    console.log('Success:', result);
-  } catch (error) {
-    console.error('Error:', error.message);
-    if (error.response) {
-      console.error('Response status:', error.response.status);
-      console.error('Response data:', error.response.data);
-    }
-  }
-}
-
-// First get channels and pickup locations, then test shipment
-async function runTests() {
-  try {
-    console.log('=== Getting available channels ===');
-    const channels = await getChannels();
-    console.log('Available channels:', JSON.stringify(channels, null, 2));
-
-    console.log('\n=== Getting available pickup locations ===');
-    const pickupLocations = await getPickupLocations();
-    console.log('Available pickup locations:', JSON.stringify(pickupLocations, null, 2));
-
-    // Update environment with correct pickup location if available
-    if (pickupLocations && pickupLocations.data && pickupLocations.data.length > 0) {
-      const firstLocation = pickupLocations.data[0];
-      console.log(`\nUsing pickup location: ${firstLocation.pickup_location}`);
-      process.env.SHIPROCKET_PICKUP_LOCATION = firstLocation.pickup_location;
-    }
-
-    console.log('\n--- Now testing shipment creation ---\n');
-    await testShipment();
-  } catch (error) {
-    console.error('Test setup failed:', error);
-  }
-}
-
-runTests();
+testShiprocketConnection();
