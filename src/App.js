@@ -13,6 +13,7 @@ import LoginModal from './components/LoginModal';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import TShirts from './pages/TShirts';
+import Polo from './pages/Polo';
 import ProductDetails from './pages/ProductDetails';
 import FAQ from './pages/FAQ';
 import Support from './pages/Support';
@@ -68,7 +69,7 @@ function AppContent() {
             <Route path="/products" element={<Products />} />
             <Route path="/t-shirts" element={<TShirts />} />
             <Route path="/product/:id" element={<ProductDetails addToCart={addToCart} />} />
-            <Route path="/polo" element={<div className="page-placeholder">Polo Shirts Coming Soon</div>} />
+            <Route path="/polo" element={<Polo />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/support" element={<Support />} />
             <Route path="/terms" element={<TermsConditions />} />
