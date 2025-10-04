@@ -31,6 +31,7 @@ function AppContent() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPromo, setCurrentPromo] = useState(0);
   const [loginMessage, setLoginMessage] = useState('');
+  const [preventLoginClose, setPreventLoginClose] = useState(false);
   const { cart, addToCart, removeItem, updateQuantity, clearCart, notification, clearNotification } = useCart();
 
   // Auto-slide promotional offers every 3 seconds
@@ -44,7 +45,8 @@ function AppContent() {
   // Listen for login modal open events from cart context
   useEffect(() => {
     const handleOpenLoginModal = () => {
-      setLoginMessage('Please login to add items to your cart and place orders.');
+      setLoginMessage('Please login to save your cart items and place orders securely.');
+      setPreventLoginClose(true);
       setIsLoginModalOpen(true);
     };
 
@@ -105,8 +107,10 @@ function AppContent() {
           onClose={() => {
             setIsLoginModalOpen(false);
             setLoginMessage('');
+            setPreventLoginClose(false);
           }}
           message={loginMessage}
+          preventClose={preventLoginClose}
         />
 
         <CartSidebar

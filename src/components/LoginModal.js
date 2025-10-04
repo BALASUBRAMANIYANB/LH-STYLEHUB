@@ -26,7 +26,7 @@ const countryCodes = [
   { code: '+966', country: 'Saudi Arabia', flag: '🇸🇦' }
 ];
 
-const LoginModal = ({ isOpen, onClose, message }) => {
+const LoginModal = ({ isOpen, onClose, message, preventClose = false }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -142,11 +142,13 @@ const LoginModal = ({ isOpen, onClose, message }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={preventClose ? undefined : onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>
-          <FaTimes />
-        </button>
+        {!preventClose && (
+          <button className="modal-close" onClick={onClose}>
+            <FaTimes />
+          </button>
+        )}
 
         <div className="modal-header">
           <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>

@@ -61,14 +61,6 @@ export function CartProvider({ children, onLoginRequired }) {
   const addToCart = (product, selectedSize) => {
     console.log('[CartProvider] addToCart called. currentUser:', currentUser);
 
-    // Require login for guest users
-    if (!currentUser) {
-      if (onLoginRequired) {
-        onLoginRequired();
-      }
-      return; // Don't add to cart for guest users
-    }
-
     setCart(prev => {
       let newCart;
       const existing = prev.find(
@@ -91,6 +83,14 @@ export function CartProvider({ children, onLoginRequired }) {
       }
       return newCart;
     });
+
+    // Show login prompt for guest users (but still allow adding to cart)
+    if (!currentUser && onLoginRequired) {
+      // Delay the modal opening slightly to ensure cart update completes
+      setTimeout(() => {
+        onLoginRequired();
+      }, 500);
+    }
   };
 
   const updateQuantity = (id, selectedSize, quantity) => {
