@@ -14,15 +14,26 @@ const Cart = () => {
 
   // Show login prompt for guest users
   if (!currentUser) {
+    const handleLoginClick = () => {
+      // Dispatch custom event to open login modal
+      const event = new CustomEvent('openLoginModal');
+      window.dispatchEvent(event);
+    };
+
     return (
       <div className="cart-page-container">
         <div className="cart-empty">
           <FaUser />
           <h2>Login to Continue</h2>
           <p>Please log in to add products to your cart and place orders</p>
-          <button className="continue-shopping-btn" onClick={() => navigate('/')}>
-            <FaArrowRight /> Go to Home
-          </button>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <button className="continue-shopping-btn" onClick={handleLoginClick}>
+              <FaUser /> Login
+            </button>
+            <button className="continue-shopping-btn" onClick={() => navigate('/')} style={{ background: '#6c757d' }}>
+              <FaArrowRight /> Go to Home
+            </button>
+          </div>
         </div>
       </div>
     );
