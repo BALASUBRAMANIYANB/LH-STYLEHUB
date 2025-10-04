@@ -48,33 +48,6 @@ export function CartProvider({ children, onLoginRequired }) {
           setCart(prev => (prev.length === 0 ? prev : []));
         }
         setLoading(false);
-
-        // Add pending item if any
-        if (pendingItem) {
-          setTimeout(() => {
-            setCart(prev => {
-              let newCart;
-              const existing = prev.find(
-                item => item.id === pendingItem.product.id && item.selectedSize === pendingItem.selectedSize
-              );
-              if (existing) {
-                newCart = prev.map(item =>
-                  item.id === pendingItem.product.id && item.selectedSize === pendingItem.selectedSize
-                    ? { ...item, quantity: item.quantity + 1 }
-                    : item
-                );
-              } else {
-                newCart = [...prev, { ...pendingItem.product, selectedSize: pendingItem.selectedSize, quantity: 1 }];
-              }
-              // Write to Firebase
-              set(ref(database, `users/${currentUser.uid}/cart`), newCart)
-                .then(() => console.log('[CartProvider] Pending item added to cart', newCart))
-                .catch((err) => console.error('[CartProvider] Cart write error for pending item', err));
-              return newCart;
-            });
-            setPendingItem(null);
-          }, 100); // Small delay to ensure cart is loaded
-        }
       });
       return () => unsubscribe();
     } else {
@@ -83,6 +56,33 @@ export function CartProvider({ children, onLoginRequired }) {
       setLoading(false);
     }
   }, [currentUser]);
+
+  // Handle pending item addition after login
+  useEffect(() => {
+    if (currentUser && pendingItem) {
+      setCart(prev => {
+        let newCart;
+        const existing = prev.find(
+          item => item.id === pendingItem.product.id && item.selectedSize === pendingItem.selectedSize
+        );
+        if (existing) {
+          newCart = prev.map(item =>
+            item.id === pendingItem.product.id && item.selectedSize === pendingItem.selectedSize
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          );
+        } else {
+          newCart = [...prev, { ...pendingItem.product, selectedSize: pendingItem.selectedSize, quantity: 1 }];
+        }
+        // Write to Firebase
+        set(ref(database, `users/${currentUser.uid}/cart`), newCart)
+          .then(() => console.log('[CartProvider] Pending item added to cart', newCart))
+          .catch((err) => console.error('[CartProvider] Cart write error for pending item', err));
+        return newCart;
+      });
+      setPendingItem(null);
+    }
+  }, [currentUser, pendingItem]);
 
   
   // Cart actions
