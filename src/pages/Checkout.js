@@ -324,8 +324,8 @@ const Checkout = ({ onOrderComplete }) => {
           <div className="auth-required">
             <FaUser />
             <h2>Authentication Required</h2>
-            <p>Please log in to complete your checkout</p>
-            <button 
+            <p>Please log in to complete your order</p>
+            <button
               className="login-btn"
               onClick={() => navigate('/')}
             >
