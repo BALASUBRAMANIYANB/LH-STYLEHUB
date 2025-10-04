@@ -107,9 +107,9 @@ const Support = () => {
                 </div>
                 <h3>WhatsApp Support</h3>
                 <p>Quick responses, instant help</p>
-                <a 
-                  href="https://wa.me/9791999113" 
-                  target="_blank" 
+                <a
+                  href="https://wa.me/919791999113"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="contact-button"
                 >

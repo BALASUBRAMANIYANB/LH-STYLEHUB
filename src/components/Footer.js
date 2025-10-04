@@ -22,7 +22,7 @@ const Footer = () => {
               <a href="https://www.instagram.com/lh_stylehub?igsh=MXN5c25rN3F6bzM4Yw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <FaInstagram />
               </a>
-              <a href="https://wa.me/9791999113" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+              <a href="https://wa.me/919791999113" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
                 <FaWhatsapp />
               </a>
             </div>

@@ -158,10 +158,10 @@ const Products = () => {
       </div>
       
       {/* WhatsApp Support */}
-      <a 
-        href="https://wa.me/1234567890" 
-        className="whatsapp-float" 
-        target="_blank" 
+      <a
+        href="https://wa.me/911234567890"
+        className="whatsapp-float"
+        target="_blank"
         rel="noopener noreferrer"
       >
         <FaWhatsapp className="whatsapp-icon" />
