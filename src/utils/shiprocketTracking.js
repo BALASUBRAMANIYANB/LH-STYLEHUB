@@ -86,7 +86,7 @@ async function createShipment(order) {
     })),
 
     // Payment and charges
-    payment_method: 'COD',
+    payment_method: order.paymentMethod === 'cod' ? 'COD' : 'Prepaid',
     sub_total: parseFloat(order.total),
     length: 20, // Package dimensions in cm
     breadth: 15,
@@ -107,9 +107,9 @@ async function createShipment(order) {
     shipmentData.channel_id = 8454052;
     console.log('Using channel ID:', shipmentData.channel_id);
 
-    // Try the regular order creation endpoint
+    // Try the adhoc order creation endpoint (doesn't require channel_id)
     const response = await axios.post(
-      `${SHIPROCKET_BASE_URL}/orders/create`,
+      `${SHIPROCKET_BASE_URL}/orders/create/adhoc`,
       shipmentData,
       {
         headers: { Authorization: `Bearer ${token}` }

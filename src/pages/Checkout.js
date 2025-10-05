@@ -194,7 +194,6 @@ const Checkout = ({ onOrderComplete }) => {
         });
 
         console.log('Shipment API response status:', shipmentResponse.status);
-        console.log('Shipment API response headers:', Object.fromEntries(shipmentResponse.headers.entries()));
 
         if (shipmentResponse.ok) {
           const shipmentData = await shipmentResponse.json();
@@ -203,10 +202,10 @@ const Checkout = ({ onOrderComplete }) => {
           // Update order with shipment details
           const shipmentUpdate = {
             shipment: {
-              awb: shipmentData.awb_code || shipmentData.awb,
+              awb: shipmentData.awb_code || shipmentData.awb || shipmentData.awb_number,
               shipmentId: shipmentData.shipment_id || shipmentData.order_id,
               courier: shipmentData.courier_name || 'Shiprocket',
-              trackingUrl: shipmentData.track_url || `https://shiprocket.co/tracking/${shipmentData.awb_code}`,
+              trackingUrl: shipmentData.track_url || shipmentData.tracking_url || `https://shiprocket.co/tracking/${shipmentData.awb_code || shipmentData.awb}`,
               createdAt: new Date().toISOString()
             }
           };
@@ -219,14 +218,6 @@ const Checkout = ({ onOrderComplete }) => {
         } else {
           const errorText = await shipmentResponse.text();
           console.error('Shipment creation failed with status:', shipmentResponse.status, 'Response:', errorText);
-
-          // Try to parse error details
-          try {
-            const errorData = JSON.parse(errorText);
-            console.error('Shiprocket error details:', errorData);
-          } catch (parseError) {
-            console.error('Could not parse error response');
-          }
 
           // Create a fallback shipment entry for manual processing
           const fallbackShipment = {
