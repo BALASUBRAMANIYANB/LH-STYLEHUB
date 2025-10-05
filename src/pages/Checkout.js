@@ -220,6 +220,14 @@ const Checkout = ({ onOrderComplete }) => {
           const errorText = await shipmentResponse.text();
           console.error('Shipment creation failed with status:', shipmentResponse.status, 'Response:', errorText);
 
+          // Try to parse error details
+          try {
+            const errorData = JSON.parse(errorText);
+            console.error('Shiprocket error details:', errorData);
+          } catch (parseError) {
+            console.error('Could not parse error response');
+          }
+
           // Create a fallback shipment entry for manual processing
           const fallbackShipment = {
             shipment: {

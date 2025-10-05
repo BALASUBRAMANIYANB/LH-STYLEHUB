@@ -49,8 +49,8 @@ async function createShipment(order) {
   const shipmentData = {
     order_id: order.orderId,
     order_date: new Date().toISOString().split('T')[0], // Today's date
-    pickup_location: process.env.SHIPROCKET_PICKUP_LOCATION || 'Primary',
-    channel_id: process.env.SHIPROCKET_CHANNEL_ID || '',
+    pickup_location: process.env.SHIPROCKET_PICKUP_LOCATION || 'Lh style hub store',
+    channel_id: '', // Leave empty for manual processing or use a valid channel ID
     comment: 'Auto-created shipment from LH StyleHub',
 
     // Billing Address
@@ -104,9 +104,9 @@ async function createShipment(order) {
   console.log('Sending shipment data to Shiprocket:', JSON.stringify(shipmentData, null, 2));
 
   try {
-    // For manual channels, use the adhoc order creation endpoint
+    // Try the regular order creation endpoint
     const response = await axios.post(
-      `${SHIPROCKET_BASE_URL}/orders/create/adhoc`,
+      `${SHIPROCKET_BASE_URL}/orders/create`,
       shipmentData,
       {
         headers: { Authorization: `Bearer ${token}` }
