@@ -49,7 +49,7 @@ async function createShipment(order) {
   const shipmentData = {
     order_id: order.orderId,
     order_date: new Date().toISOString().split('T')[0], // Today's date
-    pickup_location: process.env.SHIPROCKET_PICKUP_LOCATION || 'Lh style hub store',
+    pickup_location: '11366857',
     comment: 'Auto-created shipment from LH StyleHub',
 
     // Billing Address
