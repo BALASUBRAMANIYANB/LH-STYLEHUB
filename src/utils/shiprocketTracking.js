@@ -56,8 +56,9 @@ async function createShipment(order) {
     billing_customer_name: `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`,
     billing_last_name: order.shippingAddress.lastName,
     billing_address: order.shippingAddress.address,
+    billing_address_2: '', // Optional second address line
     billing_city: order.shippingAddress.city,
-    billing_pincode: parseInt(order.shippingAddress.zipCode),
+    billing_pincode: order.shippingAddress.zipCode.toString(), // Keep as string
     billing_state: order.shippingAddress.state,
     billing_country: order.shippingAddress.country,
     billing_email: order.shippingAddress.email,
@@ -67,8 +68,9 @@ async function createShipment(order) {
     shipping_is_billing: true,
     shipping_customer_name: `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`,
     shipping_address: order.shippingAddress.address,
+    shipping_address_2: '', // Optional second address line
     shipping_city: order.shippingAddress.city,
-    shipping_pincode: parseInt(order.shippingAddress.zipCode),
+    shipping_pincode: order.shippingAddress.zipCode.toString(), // Keep as string
     shipping_country: order.shippingAddress.country,
     shipping_state: order.shippingAddress.state,
     shipping_email: order.shippingAddress.email,
@@ -88,10 +90,10 @@ async function createShipment(order) {
     // Payment and charges
     payment_method: order.paymentMethod === 'cod' ? 'COD' : 'Prepaid',
     sub_total: parseFloat(order.total),
-    length: 20, // Package dimensions in cm
-    breadth: 15,
+    length: 30, // Package dimensions in cm (more realistic for clothing)
+    breadth: 25,
     height: 5,
-    weight: 0.5 // Weight in kg
+    weight: 0.8 // Weight in kg (more realistic for T-shirt packaging)
   };
 
   console.log('=== SHIPMENT CREATION DEBUG ===');
@@ -119,8 +121,11 @@ async function createShipment(order) {
     // Use the first available pickup location if available
     if (pickupResponse.data && pickupResponse.data.data && pickupResponse.data.data.shipping_address && pickupResponse.data.data.shipping_address.length > 0) {
       const pickupLocation = pickupResponse.data.data.shipping_address[0];
-      shipmentData.pickup_location = pickupLocation.pickup_location || pickupLocation.address || 'Lh style hub store';
-      console.log('Using pickup location:', shipmentData.pickup_location);
+      shipmentData.pickup_location = pickupLocation.pickup_location || pickupLocation.address || pickupLocation.id || 'Lh style hub store';
+      console.log('Using pickup location:', shipmentData.pickup_location, 'from available locations:', pickupResponse.data.data.shipping_address);
+    } else {
+      console.log('No pickup locations found, using default');
+      shipmentData.pickup_location = 'Lh style hub store';
     }
 
     // Try the adhoc order creation endpoint (doesn't require channel_id)
