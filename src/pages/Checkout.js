@@ -184,6 +184,9 @@ const Checkout = ({ onOrderComplete }) => {
       // Automatically create shipment on Shiprocket
       try {
         console.log('Attempting to create shipment for order:', orderKey);
+        console.log('Shipment API URL:', '/api/create-shipment');
+        console.log('Order data being sent:', { order: { ...order, id: orderKey } });
+
         const shipmentResponse = await fetch('/api/create-shipment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -191,6 +194,7 @@ const Checkout = ({ onOrderComplete }) => {
         });
 
         console.log('Shipment API response status:', shipmentResponse.status);
+        console.log('Shipment API response headers:', Object.fromEntries(shipmentResponse.headers.entries()));
 
         if (shipmentResponse.ok) {
           const shipmentData = await shipmentResponse.json();
