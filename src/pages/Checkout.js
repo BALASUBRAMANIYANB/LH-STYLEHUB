@@ -202,11 +202,12 @@ const Checkout = ({ onOrderComplete }) => {
           // Update order with shipment details
           const shipmentUpdate = {
             shipment: {
-              awb: shipmentData.awb_code || shipmentData.awb || shipmentData.awb_number,
-              shipmentId: shipmentData.shipment_id || shipmentData.order_id,
+              awb: shipmentData.awb_code || shipmentData.awb || shipmentData.awb_number || 'PENDING',
+              shipmentId: shipmentData.shipment_id || shipmentData.order_id || 'PENDING',
               courier: shipmentData.courier_name || 'Shiprocket',
-              trackingUrl: shipmentData.track_url || shipmentData.tracking_url || `https://shiprocket.co/tracking/${shipmentData.awb_code || shipmentData.awb}`,
-              createdAt: new Date().toISOString()
+              trackingUrl: shipmentData.track_url || shipmentData.tracking_url || null,
+              createdAt: new Date().toISOString(),
+              status: shipmentData.status || 'created'
             }
           };
 

@@ -49,7 +49,7 @@ async function createShipment(order) {
   const shipmentData = {
     order_id: order.orderId,
     order_date: new Date().toISOString().split('T')[0], // Today's date
-    pickup_location: '11366857',
+    pickup_location: process.env.SHIPROCKET_PICKUP_LOCATION || 'Lh style hub store',
     comment: 'Auto-created shipment from LH StyleHub',
 
     // Billing Address
@@ -106,6 +106,22 @@ async function createShipment(order) {
     // Use the specific channel ID provided
     shipmentData.channel_id = 8454052;
     console.log('Using channel ID:', shipmentData.channel_id);
+
+    // Get pickup locations to ensure we use the correct one
+    console.log('Getting pickup locations...');
+    const pickupResponse = await axios.get(
+      `${SHIPROCKET_BASE_URL}/settings/company/pickup`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    console.log('Available pickup locations:', pickupResponse.data);
+
+    // Use the first available pickup location if available
+    if (pickupResponse.data && pickupResponse.data.data && pickupResponse.data.data.shipping_address && pickupResponse.data.data.shipping_address.length > 0) {
+      const pickupLocation = pickupResponse.data.data.shipping_address[0];
+      shipmentData.pickup_location = pickupLocation.pickup_location || pickupLocation.address || 'Lh style hub store';
+      console.log('Using pickup location:', shipmentData.pickup_location);
+    }
 
     // Try the adhoc order creation endpoint (doesn't require channel_id)
     const response = await axios.post(
