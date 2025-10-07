@@ -62,18 +62,63 @@ const Checkout = ({ onOrderComplete }) => {
       }
       originalConsoleError.apply(console, args);
     };
-    // Ideally, order details should come from backend for security
-    const options = {
-      key: razorpayKey, // Razorpay Key ID from environment
-      amount: Math.round(getFinalTotal() * 100), // Amount in paise
-      currency: 'INR',
-      name: 'LH STYLEHUB',
-      description: 'Order Payment',
-      image: '/images/Logo/LH_Logo_White-01.png',
-      handler: function (response) {
-        // On successful payment, process the order
-        processOrderAfterPayment();
-      },
+    try {
+      // First, create a Razorpay order on the backend
+      console.log('Creating Razorpay order...');
+      const orderResponse = await fetch('/api/create-razorpay-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: getFinalTotal(),
+          currency: 'INR',
+          receipt: `LH-${Date.now()}`
+        })
+      });
+
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json();
+        throw new Error(errorData.error || 'Failed to create order');
+      }
+
+      const orderData = await orderResponse.json();
+      console.log('Razorpay order created:', orderData);
+
+      // Now open Razorpay checkout with the order ID
+      const options = {
+        key: razorpayKey,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.id, // Use the order ID from backend
+        name: 'LH STYLEHUB',
+        description: 'Order Payment',
+        image: '/images/Logo/LH_Logo_White-01.png',
+        handler: async function (response) {
+          console.log('Payment successful:', response);
+          // Capture the payment after successful authorization
+          try {
+            const captureResponse = await fetch('/api/capture-razorpay-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                paymentId: response.razorpay_payment_id,
+                amount: getFinalTotal()
+              })
+            });
+
+            if (captureResponse.ok) {
+              console.log('Payment captured successfully');
+              // Now process the order
+              await processOrderAfterPayment();
+            } else {
+              const captureError = await captureResponse.json();
+              console.error('Payment capture failed:', captureError);
+              setError('Payment was authorized but capture failed. Please contact support.');
+            }
+          } catch (captureError) {
+            console.error('Payment capture error:', captureError);
+            setError('Payment was authorized but capture failed. Please contact support.');
+          }
+        },
       prefill: {
         name: shippingInfo.firstName + ' ' + shippingInfo.lastName,
         email: shippingInfo.email,
@@ -88,14 +133,20 @@ const Checkout = ({ onOrderComplete }) => {
         }
       }
     };
+
     const rzp = new window.Razorpay(options);
     rzp.open();
-    setLoading(false);
 
     // Restore original console.error after modal closes
     setTimeout(() => {
       console.error = originalConsoleError;
-    }, 10000); // Restore after 10 seconds
+    }, 10000);
+
+    } catch (error) {
+      console.error('Razorpay order creation failed:', error);
+      setError('Failed to initialize payment. Please try again.');
+      setLoading(false);
+    }
   };
   const navigate = useNavigate();
   const { currentUser, userProfile, addOrder, updateOrder } = useAuth();

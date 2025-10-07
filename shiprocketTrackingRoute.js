@@ -1,12 +1,17 @@
-// Express route for Shiprocket order tracking
+// Express route for Shiprocket order tracking and Razorpay payments
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const crypto = require('crypto');
 
 // Set these with your Shiprocket credentials
 const SHIPROCKET_EMAIL = process.env.SHIPROCKET_EMAIL;
 const SHIPROCKET_PASSWORD = process.env.SHIPROCKET_PASSWORD;
 const SHIPROCKET_BASE_URL = 'https://apiv2.shiprocket.in/v1/external';
+
+// Razorpay credentials
+const RAZORPAY_KEY_ID = process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_live_ROYxFzNDDRuwWs';
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '2k21aRdOrsHL7fbvqCD0YBWW';
 
 let shiprocketToken = null;
 
@@ -19,6 +24,76 @@ async function authenticateShiprocket() {
   shiprocketToken = response.data.token;
   return shiprocketToken;
 }
+
+// Razorpay order creation
+router.post('/create-razorpay-order', async (req, res) => {
+  try {
+    const { amount, currency = 'INR', receipt } = req.body;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ error: 'Valid amount is required' });
+    }
+
+    // Create Razorpay order
+    const razorpayOrder = {
+      amount: Math.round(amount * 100), // Convert to paise
+      currency,
+      receipt: receipt || `receipt_${Date.now()}`,
+      payment_capture: 0 // Don't auto-capture, we'll capture manually
+    };
+
+    const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
+
+    const response = await axios.post('https://api.razorpay.com/v1/orders', razorpayOrder, {
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log('Razorpay order created:', response.data);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Razorpay order creation failed:', error.response?.data || error.message);
+    res.status(500).json({
+      error: 'Failed to create Razorpay order',
+      details: error.response?.data || error.message
+    });
+  }
+});
+
+// Razorpay payment capture
+router.post('/capture-razorpay-payment', async (req, res) => {
+  try {
+    const { paymentId, amount } = req.body;
+
+    if (!paymentId || !amount) {
+      return res.status(400).json({ error: 'Payment ID and amount are required' });
+    }
+
+    const captureAmount = Math.round(amount * 100); // Convert to paise
+    const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
+
+    const response = await axios.post(`https://api.razorpay.com/v1/payments/${paymentId}/capture`, {
+      amount: captureAmount,
+      currency: 'INR'
+    }, {
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log('Payment captured successfully:', response.data);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Payment capture failed:', error.response?.data || error.message);
+    res.status(500).json({
+      error: 'Failed to capture payment',
+      details: error.response?.data || error.message
+    });
+  }
+});
 
 router.post('/track', async (req, res) => {
   const { awb } = req.body;
